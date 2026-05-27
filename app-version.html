@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#101321">
+    <meta name="description" content="Join the Moodix app version waitlist.">
+    <title>Moodix | App version</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.svg">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body class="signup-page">
+    <header class="site-header">
+      <a class="brand" href="index.html" aria-label="Moodix home">
+        <span class="brand-mark" data-brand-mark aria-hidden="true"></span>
+        <span>Moodix</span>
+      </a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="mood-check.html">Mood check</a>
+        <a href="import.html">Upload music</a>
+        <a href="app-version.html">App version</a>
+      </nav>
+      <a class="header-cta" href="mood-check.html">Start again</a>
+    </header>
+
+    <main>
+      <section class="signup-hero" aria-labelledby="signup-title">
+        <div class="signup-copy">
+          <p class="eyebrow">App version</p>
+          <h1 id="signup-title">Would you join the Moodix app version?</h1>
+          <p>
+            The app version would remember your daily check-ins, import playlists faster, and build mood matches from your real listening patterns.
+          </p>
+          <div class="intent-buttons" data-intent-buttons>
+            <button class="intent-button active" type="button" data-intent="yes">Yes, early access</button>
+            <button class="intent-button" type="button" data-intent="maybe">Maybe, send updates</button>
+            <button class="intent-button" type="button" data-intent="later">Not now</button>
+          </div>
+        </div>
+
+        <form class="signup-card" data-signup-form>
+          <input type="hidden" name="intent" value="yes" data-intent-field>
+          <label for="signup-name">Name</label>
+          <input id="signup-name" name="name" type="text" autocomplete="name" placeholder="Your name">
+
+          <label for="signup-email">Email</label>
+          <input id="signup-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+
+          <label for="signup-source">Preferred music source</label>
+          <select id="signup-source" name="source">
+            <option>Spotify</option>
+            <option>Apple Music</option>
+            <option>YouTube Music</option>
+            <option>SoundCloud</option>
+            <option>Other</option>
+          </select>
+
+          <button class="button primary" type="submit">Join the app waitlist</button>
+          <p class="form-note" data-signup-note></p>
+        </form>
+      </section>
+    </main>
+
+    <script src="app.js?v=2" defer></script>
+  </body>
+</html>

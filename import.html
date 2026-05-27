@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#101321">
+    <meta name="description" content="Upload or paste music into Moodix and get a top-five song match for your day.">
+    <title>Moodix | Upload music</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.svg">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="index.html" aria-label="Moodix home">
+        <span class="brand-mark" data-brand-mark aria-hidden="true"></span>
+        <span>Moodix</span>
+      </a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="mood-check.html">Mood check</a>
+        <a href="import.html">Upload music</a>
+        <a href="app-version.html">App version</a>
+      </nav>
+      <a class="header-cta" href="app-version.html">App version</a>
+    </header>
+
+    <main>
+      <section class="flow-hero compact-flow" aria-labelledby="import-title">
+        <div>
+          <p class="eyebrow">Upload music</p>
+          <h1 id="import-title">Choose where your songs come from.</h1>
+          <p class="hero-copy" data-import-context>Your Moodix word will shape the ranking.</p>
+        </div>
+        <aside class="today-card">
+          <span>Your day</span>
+          <strong data-import-word>Unscored</strong>
+          <small data-import-day>Run the mood check first for a sharper match.</small>
+        </aside>
+      </section>
+
+      <section class="section upload-page-section">
+        <div class="source-picker" aria-label="Prototype music source options">
+          <button class="source-card active" type="button" data-source="Spotify">Spotify</button>
+          <button class="source-card" type="button" data-source="Apple Music">Apple Music</button>
+          <button class="source-card" type="button" data-source="YouTube Music">YouTube Music</button>
+          <button class="source-card" type="button" data-source="SoundCloud">SoundCloud</button>
+          <button class="source-card" type="button" data-source="Other">Other</button>
+        </div>
+
+        <div class="upload-layout">
+          <div class="upload-box">
+            <label for="playlist-file">CSV file</label>
+            <input id="playlist-file" type="file" accept=".csv,text/csv,text/plain" data-playlist-file>
+            <label for="playlist-paste">Paste tracks</label>
+            <textarea id="playlist-paste" data-playlist-text rows="10" spellcheck="false">Blinding Lights, The Weeknd, energetic, high, synthpop, commute
+Sunflower, Post Malone and Swae Lee, happy, medium, pop, morning
+Weightless, Marconi Union, calm, low, ambient, sleep
+Good Days, SZA, reflective, medium, r&b, unwind
+Levitating, Dua Lipa, happy, high, dance, workout
+Intro, The xx, focused, medium, indie electronic, work</textarea>
+            <button class="button primary" type="button" data-generate-results>Find my top 5</button>
+            <p class="helper-text" data-import-note>Prototype source: <strong data-selected-source>Spotify</strong>. Real account connection is not enabled yet.</p>
+          </div>
+
+          <section class="single-results" aria-labelledby="results-title">
+            <p class="eyebrow">Moodix result</p>
+            <h2 id="results-title">Your top five will appear here.</h2>
+            <div class="results-grid single" data-results-grid></div>
+            <a class="button secondary dark" href="app-version.html" data-app-version-link hidden>Next: app version</a>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <script src="app.js?v=2" defer></script>
+  </body>
+</html>

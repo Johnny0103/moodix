@@ -6,9 +6,9 @@
     <meta name="theme-color" content="#101321">
     <meta
       name="description"
-      content="Moodix turns your weekly mood check-in and playlist export into daily top-five song recommendations."
+      content="Moodix reads your day, finds one word for the mood, and turns your playlist into a top-five soundtrack."
     >
-    <title>Moodix | Daily mood playlists from your music</title>
+    <title>Moodix | Music for the day you are actually in</title>
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="assets/apple-touch-icon.svg">
@@ -16,118 +16,90 @@
   </head>
   <body>
     <header class="site-header">
-      <a class="brand" href="#top" aria-label="Moodix home">
-        <span class="brand-mark" aria-hidden="true">mx</span>
+      <a class="brand" href="index.html" aria-label="Moodix home">
+        <span class="brand-mark" data-brand-mark aria-hidden="true"></span>
         <span>Moodix</span>
       </a>
       <nav class="nav-links" aria-label="Primary navigation">
-        <a href="#checkin">Mood check</a>
-        <a href="#import">Import</a>
-        <a href="#results">Results</a>
+        <a href="mood-check.html">Mood check</a>
+        <a href="import.html">Upload music</a>
+        <a href="app-version.html">App version</a>
       </nav>
-      <a class="header-cta" href="signup.html">Get the app</a>
+      <a class="header-cta" href="mood-check.html">Start mood check</a>
     </header>
 
-    <main id="top">
+    <main>
       <section class="hero" aria-labelledby="hero-title">
         <img class="hero-image" src="assets/moodix-hero.png" alt="Music dashboard glowing on a laptop and phone with colorful playlist cards">
         <div class="hero-scrim" aria-hidden="true"></div>
         <div class="hero-content">
-          <p class="eyebrow">Music tuned to your real week</p>
-          <h1 id="hero-title">Your week, remixed for your mood.</h1>
+          <p class="eyebrow">A daily mood reader for your music</p>
+          <h1 id="hero-title">Let today pick the songs.</h1>
           <p class="hero-copy">
-            Answer a few personal questions, import a playlist export, and Moodix ranks five songs for every day based on how you feel and where you want the music to take you.
+            Moodix starts with the day you are in, asks a few quiet questions, gives your day one word, then turns your own playlist into five songs that fit.
           </p>
           <div class="hero-actions">
-            <a class="button primary" href="#checkin">Start mood check</a>
-            <a class="button secondary" href="signup.html">Join app waitlist</a>
+            <a class="button primary" href="mood-check.html">Start mood check</a>
+            <a class="button secondary" href="#logo-options">Choose a logo</a>
           </div>
         </div>
       </section>
 
-      <section class="source-strip" aria-label="Prototype music source options">
-        <button class="source-chip active" type="button" data-source="Spotify">Spotify</button>
-        <button class="source-chip" type="button" data-source="Apple Music">Apple Music</button>
-        <button class="source-chip" type="button" data-source="YouTube Music">YouTube Music</button>
-        <button class="source-chip" type="button" data-source="SoundCloud">SoundCloud</button>
-        <button class="source-chip" type="button" data-source="Other">Other</button>
-      </section>
-
-      <section class="section split-section" aria-labelledby="how-title">
+      <section class="section split-section" aria-labelledby="flow-title">
         <div>
-          <p class="eyebrow">How Moodix works</p>
-          <h2 id="how-title">Import the songs you already love. Let the week choose the order.</h2>
+          <p class="eyebrow">The new flow</p>
+          <h2 id="flow-title">One clean step at a time.</h2>
         </div>
         <div class="steps-grid">
           <article>
             <span>01</span>
-            <h3>Check in</h3>
-            <p>Give each day a mood, energy level, activity, and emotional direction.</p>
+            <h3>Read today</h3>
+            <p>Local time shows your current day, then Moodix asks natural questions about what may happen.</p>
           </article>
           <article>
             <span>02</span>
-            <h3>Bring music</h3>
-            <p>Upload a CSV or paste a simple playlist export from any music source.</p>
+            <h3>Name the feeling</h3>
+            <p>Your answers become one single word that describes the emotional color of the day.</p>
           </article>
           <article>
             <span>03</span>
-            <h3>Get the five</h3>
-            <p>Review daily top-five picks with a clear reason for every match.</p>
+            <h3>Upload music</h3>
+            <p>Choose a source, paste or upload a playlist, and get a ranked top five.</p>
           </article>
         </div>
       </section>
 
-      <section id="checkin" class="section workspace-section" aria-labelledby="checkin-title">
-        <div class="section-heading">
-          <p class="eyebrow">Weekly mood check</p>
-          <h2 id="checkin-title">Tell Moodix what each day needs.</h2>
-          <p>Use quick choices now. The app version can learn your patterns over time.</p>
-        </div>
-
-        <form class="week-grid" data-mood-form>
-          <noscript>Enable JavaScript to use the mood matching prototype.</noscript>
-        </form>
-      </section>
-
-      <section id="import" class="section import-section" aria-labelledby="import-title">
-        <div class="import-panel">
-          <div>
-            <p class="eyebrow">Playlist import</p>
-            <h2 id="import-title">Upload a playlist from anywhere.</h2>
-            <p>
-              This prototype accepts CSV or pasted rows. Use columns like title, artist, mood, energy, genre, and activity when you have them.
-            </p>
-          </div>
-          <div class="upload-box">
-            <label for="playlist-file">CSV file</label>
-            <input id="playlist-file" type="file" accept=".csv,text/csv,text/plain" data-playlist-file>
-            <label for="playlist-paste">Paste tracks</label>
-            <textarea id="playlist-paste" data-playlist-text rows="9" spellcheck="false">Blinding Lights, The Weeknd, energetic, high, synthpop, commute
-Sunflower, Post Malone and Swae Lee, happy, medium, pop, morning
-Weightless, Marconi Union, calm, low, ambient, sleep
-Good Days, SZA, reflective, medium, r&b, unwind
-Levitating, Dua Lipa, happy, high, dance, workout</textarea>
-            <button class="button primary" type="button" data-generate-results>Generate daily top 5</button>
-            <p class="helper-text" data-import-note>Prototype source: <strong data-selected-source>Spotify</strong>. Real account connection is not enabled yet.</p>
-          </div>
-        </div>
-      </section>
-
-      <section id="results" class="section results-section" aria-labelledby="results-title">
+      <section id="logo-options" class="section logo-section" aria-labelledby="logo-title">
         <div class="section-heading compact">
-          <p class="eyebrow">Daily results</p>
-          <h2 id="results-title">Seven days. Five songs each.</h2>
-          <p data-results-summary>Generate your first Moodix match to see daily recommendations.</p>
+          <p class="eyebrow">Brand direction</p>
+          <h2 id="logo-title">Choose a Moodix logo option.</h2>
+          <p>The choice saves in this browser and updates the mark across the prototype.</p>
         </div>
-        <div class="results-grid" data-results-grid></div>
+        <div class="logo-grid">
+          <button class="logo-choice active" type="button" data-logo-choice="pulse">
+            <span class="logo-preview" data-logo-preview="pulse"></span>
+            <strong>Pulse</strong>
+            <small>Best for a modern music app.</small>
+          </button>
+          <button class="logo-choice" type="button" data-logo-choice="orbit">
+            <span class="logo-preview" data-logo-preview="orbit"></span>
+            <strong>Orbit</strong>
+            <small>Best for a mood companion.</small>
+          </button>
+          <button class="logo-choice" type="button" data-logo-choice="wave">
+            <span class="logo-preview" data-logo-preview="wave"></span>
+            <strong>Wave</strong>
+            <small>Best for playlist utility.</small>
+          </button>
+        </div>
       </section>
     </main>
 
     <footer class="site-footer">
       <span>Moodix</span>
-      <a href="signup.html">Sign up for the app version</a>
+      <a href="mood-check.html">Start your check-in</a>
     </footer>
 
-    <script src="app.js?v=1" defer></script>
+    <script src="app.js?v=2" defer></script>
   </body>
 </html>
