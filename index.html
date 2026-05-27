@@ -3,12 +3,12 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#226f68">
+    <meta name="theme-color" content="#101321">
     <meta
       name="description"
-      content="CareCircle is a shared care dashboard for families coordinating medications, appointments, tasks, notes, and documents for an aging parent."
+      content="Moodix turns your weekly mood check-in and playlist export into daily top-five song recommendations."
     >
-    <title>CareCircle | Shared care dashboard for families</title>
+    <title>Moodix | Daily mood playlists from your music</title>
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="assets/apple-touch-icon.svg">
@@ -16,231 +16,118 @@
   </head>
   <body>
     <header class="site-header">
-      <a class="brand" href="#top" aria-label="CareCircle home">
-        <span class="brand-mark" aria-hidden="true">K</span>
-        <span>CareCircle</span>
+      <a class="brand" href="#top" aria-label="Moodix home">
+        <span class="brand-mark" aria-hidden="true">mx</span>
+        <span>Moodix</span>
       </a>
       <nav class="nav-links" aria-label="Primary navigation">
-        <a href="#prototype">Preview</a>
-        <a href="#pricing">Pricing</a>
-        <a href="#waitlist">Waitlist</a>
+        <a href="#checkin">Mood check</a>
+        <a href="#import">Import</a>
+        <a href="#results">Results</a>
       </nav>
-      <a class="header-cta" href="#waitlist">Join waitlist</a>
+      <a class="header-cta" href="signup.html">Get the app</a>
     </header>
 
     <main id="top">
       <section class="hero" aria-labelledby="hero-title">
-        <img class="hero-image" src="assets/care-hero.png" alt="Adult child and older parent reviewing a care plan together at a kitchen table">
+        <img class="hero-image" src="assets/moodix-hero.png" alt="Music dashboard glowing on a laptop and phone with colorful playlist cards">
         <div class="hero-scrim" aria-hidden="true"></div>
         <div class="hero-content">
-          <p class="eyebrow">Care coordination for real families</p>
-          <h1 id="hero-title">One shared place to manage care for an aging parent.</h1>
+          <p class="eyebrow">Music tuned to your real week</p>
+          <h1 id="hero-title">Your week, remixed for your mood.</h1>
           <p class="hero-copy">
-            Coordinate medications, appointments, family tasks, notes, documents, and weekly summaries without turning care into a group-chat scavenger hunt.
+            Answer a few personal questions, import a playlist export, and Moodix ranks five songs for every day based on how you feel and where you want the music to take you.
           </p>
-          <form class="hero-form" data-waitlist-form>
-            <label class="sr-only" for="hero-email">Email address</label>
-            <input id="hero-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
-            <button type="submit">Reserve founding plan</button>
-          </form>
-          <p class="form-note" data-form-note>Founding family plan: $9/month when early access opens.</p>
-        </div>
-      </section>
-
-      <section class="signal-strip" aria-label="Product highlights">
-        <div>
-          <strong>5 min</strong>
-          <span>to create a care profile</span>
-        </div>
-        <div>
-          <strong>$9/mo</strong>
-          <span>founding family price</span>
-        </div>
-        <div>
-          <strong>PWA</strong>
-          <span>installable on phone and desktop</span>
-        </div>
-      </section>
-
-      <section class="section two-column" aria-labelledby="problem-title">
-        <div>
-          <p class="eyebrow">Why families pay</p>
-          <h2 id="problem-title">Care breaks down when the details live in five different places.</h2>
-        </div>
-        <div class="pain-list">
-          <article>
-            <span aria-hidden="true">01</span>
-            <h3>Medication details change quietly</h3>
-            <p>Families need one current list, refill notes, and a way to see who checked what.</p>
-          </article>
-          <article>
-            <span aria-hidden="true">02</span>
-            <h3>Appointments create hidden work</h3>
-            <p>Rides, questions, documents, follow-ups, and summaries need owners before the visit.</p>
-          </article>
-          <article>
-            <span aria-hidden="true">03</span>
-            <h3>Care conversations disappear</h3>
-            <p>A shared timeline makes it easier to spot changes and keep siblings aligned.</p>
-          </article>
-        </div>
-      </section>
-
-      <section id="prototype" class="section prototype-section" aria-labelledby="prototype-title">
-        <div class="section-heading">
-          <p class="eyebrow">Clickable MVP preview</p>
-          <h2 id="prototype-title">The first product is a calm operating room for family care.</h2>
-        </div>
-
-        <div class="app-shell" aria-label="CareCircle dashboard preview">
-          <aside class="sidebar">
-            <div class="profile-chip">
-              <span class="avatar" aria-hidden="true">ML</span>
-              <div>
-                <strong>Maria Lopez</strong>
-                <small>Parent profile</small>
-              </div>
-            </div>
-            <button class="side-link active" data-panel="today" type="button">Today</button>
-            <button class="side-link" data-panel="meds" type="button">Meds</button>
-            <button class="side-link" data-panel="appointments" type="button">Appointments</button>
-            <button class="side-link" data-panel="notes" type="button">Notes</button>
-          </aside>
-
-          <div class="dashboard">
-            <div class="dashboard-top">
-              <div>
-                <p class="eyebrow">Tuesday care plan</p>
-                <h3 data-panel-title>Today</h3>
-              </div>
-              <button class="icon-button" type="button" aria-label="Invite family member" title="Invite family member">+</button>
-            </div>
-
-            <div class="panel active" id="panel-today">
-              <div class="task-row">
-                <input type="checkbox" id="task-1">
-                <label for="task-1">
-                  <strong>Confirm cardiology ride</strong>
-                  <span>Assigned to Daniel, due 4:00 PM</span>
-                </label>
-              </div>
-              <div class="task-row">
-                <input type="checkbox" id="task-2" checked>
-                <label for="task-2">
-                  <strong>Pick up refill</strong>
-                  <span>At Lakeview Pharmacy</span>
-                </label>
-              </div>
-              <div class="summary-card">
-                <span class="mini-label">Weekly summary</span>
-                <p>Three completed tasks, one new blood pressure note, and a Friday appointment that needs a driver.</p>
-              </div>
-            </div>
-
-            <div class="panel" id="panel-meds">
-              <div class="med-grid">
-                <article>
-                  <strong>Lisinopril</strong>
-                  <span>10mg · Morning</span>
-                  <small>Refill in 8 days</small>
-                </article>
-                <article>
-                  <strong>Metformin</strong>
-                  <span>500mg · Evening</span>
-                  <small>Question for doctor</small>
-                </article>
-              </div>
-            </div>
-
-            <div class="panel" id="panel-appointments">
-              <div class="appointment">
-                <time datetime="2026-06-05">Jun 5</time>
-                <div>
-                  <strong>Cardiology follow-up</strong>
-                  <span>Bring medication list and recent BP readings</span>
-                </div>
-              </div>
-              <div class="appointment">
-                <time datetime="2026-06-14">Jun 14</time>
-                <div>
-                  <strong>Primary care check-in</strong>
-                  <span>Ask about sleep and appetite changes</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="panel" id="panel-notes">
-              <ol class="timeline">
-                <li>
-                  <strong>Elena</strong>
-                  <span>Mom seemed more tired after lunch. Added note for Friday visit.</span>
-                </li>
-                <li>
-                  <strong>Daniel</strong>
-                  <span>Uploaded new insurance card and pharmacy receipt.</span>
-                </li>
-              </ol>
-            </div>
+          <div class="hero-actions">
+            <a class="button primary" href="#checkin">Start mood check</a>
+            <a class="button secondary" href="signup.html">Join app waitlist</a>
           </div>
         </div>
       </section>
 
-      <section id="pricing" class="section pricing-section" aria-labelledby="pricing-title">
-        <div class="section-heading">
-          <p class="eyebrow">Simple monetization</p>
-          <h2 id="pricing-title">Charge the care household, not the parent.</h2>
+      <section class="source-strip" aria-label="Prototype music source options">
+        <button class="source-chip active" type="button" data-source="Spotify">Spotify</button>
+        <button class="source-chip" type="button" data-source="Apple Music">Apple Music</button>
+        <button class="source-chip" type="button" data-source="YouTube Music">YouTube Music</button>
+        <button class="source-chip" type="button" data-source="SoundCloud">SoundCloud</button>
+        <button class="source-chip" type="button" data-source="Other">Other</button>
+      </section>
+
+      <section class="section split-section" aria-labelledby="how-title">
+        <div>
+          <p class="eyebrow">How Moodix works</p>
+          <h2 id="how-title">Import the songs you already love. Let the week choose the order.</h2>
         </div>
-        <div class="pricing-grid">
-          <article class="price-card">
-            <h3>Starter</h3>
-            <p class="price">$0</p>
-            <p>One parent profile, two family members, basic tasks and notes.</p>
+        <div class="steps-grid">
+          <article>
+            <span>01</span>
+            <h3>Check in</h3>
+            <p>Give each day a mood, energy level, activity, and emotional direction.</p>
           </article>
-          <article class="price-card featured">
-            <span class="badge">Launch offer</span>
-            <h3>Founding Family</h3>
-            <p class="price">$9<span>/mo</span></p>
-            <p>Medication list, appointments, family tasks, notes, documents, and email reminders.</p>
+          <article>
+            <span>02</span>
+            <h3>Bring music</h3>
+            <p>Upload a CSV or paste a simple playlist export from any music source.</p>
           </article>
-          <article class="price-card">
-            <h3>Care Circle</h3>
-            <p class="price">$19<span>/mo</span></p>
-            <p>Multiple profiles, weekly summaries, advanced documents, and paid caregiver access.</p>
+          <article>
+            <span>03</span>
+            <h3>Get the five</h3>
+            <p>Review daily top-five picks with a clear reason for every match.</p>
           </article>
         </div>
       </section>
 
-      <section id="waitlist" class="section waitlist-section" aria-labelledby="waitlist-title">
-        <div>
-          <p class="eyebrow">Validate before building too much</p>
-          <h2 id="waitlist-title">Join early access and help shape the first version.</h2>
-          <p>
-            This waitlist is a lightweight local prototype right now. Replace it with Supabase or your email provider when you are ready to collect real signups.
-          </p>
+      <section id="checkin" class="section workspace-section" aria-labelledby="checkin-title">
+        <div class="section-heading">
+          <p class="eyebrow">Weekly mood check</p>
+          <h2 id="checkin-title">Tell Moodix what each day needs.</h2>
+          <p>Use quick choices now. The app version can learn your patterns over time.</p>
         </div>
-        <form class="waitlist-card" data-waitlist-form>
-          <label for="name">Name</label>
-          <input id="name" name="name" type="text" autocomplete="name" placeholder="Your name">
-          <label for="email">Email</label>
-          <input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
-          <label for="role">I am a...</label>
-          <select id="role" name="role">
-            <option>Adult child caring for a parent</option>
-            <option>Spouse or partner caregiver</option>
-            <option>Professional caregiver</option>
-            <option>Care manager or agency</option>
-          </select>
-          <button type="submit">Join the waitlist</button>
-          <p class="form-note" data-form-note></p>
+
+        <form class="week-grid" data-mood-form>
+          <noscript>Enable JavaScript to use the mood matching prototype.</noscript>
         </form>
+      </section>
+
+      <section id="import" class="section import-section" aria-labelledby="import-title">
+        <div class="import-panel">
+          <div>
+            <p class="eyebrow">Playlist import</p>
+            <h2 id="import-title">Upload a playlist from anywhere.</h2>
+            <p>
+              This prototype accepts CSV or pasted rows. Use columns like title, artist, mood, energy, genre, and activity when you have them.
+            </p>
+          </div>
+          <div class="upload-box">
+            <label for="playlist-file">CSV file</label>
+            <input id="playlist-file" type="file" accept=".csv,text/csv,text/plain" data-playlist-file>
+            <label for="playlist-paste">Paste tracks</label>
+            <textarea id="playlist-paste" data-playlist-text rows="9" spellcheck="false">Blinding Lights, The Weeknd, energetic, high, synthpop, commute
+Sunflower, Post Malone and Swae Lee, happy, medium, pop, morning
+Weightless, Marconi Union, calm, low, ambient, sleep
+Good Days, SZA, reflective, medium, r&b, unwind
+Levitating, Dua Lipa, happy, high, dance, workout</textarea>
+            <button class="button primary" type="button" data-generate-results>Generate daily top 5</button>
+            <p class="helper-text" data-import-note>Prototype source: <strong data-selected-source>Spotify</strong>. Real account connection is not enabled yet.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="results" class="section results-section" aria-labelledby="results-title">
+        <div class="section-heading compact">
+          <p class="eyebrow">Daily results</p>
+          <h2 id="results-title">Seven days. Five songs each.</h2>
+          <p data-results-summary>Generate your first Moodix match to see daily recommendations.</p>
+        </div>
+        <div class="results-grid" data-results-grid></div>
       </section>
     </main>
 
     <footer class="site-footer">
-      <span>CareCircle</span>
-      <a href="mailto:hello@example.com">hello@example.com</a>
+      <span>Moodix</span>
+      <a href="signup.html">Sign up for the app version</a>
     </footer>
 
-    <script src="app.js?v=7" defer></script>
+    <script src="app.js?v=1" defer></script>
   </body>
 </html>

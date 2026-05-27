@@ -1,11 +1,12 @@
-const CACHE_NAME = "carecircle-v7";
+const CACHE_NAME = "moodix-v1";
 const ASSETS = [
   "./",
   "index.html",
+  "signup.html",
   "styles.css",
-  "app.js?v=7",
+  "app.js?v=1",
   "manifest.webmanifest",
-  "assets/care-hero.png",
+  "assets/moodix-hero.png",
   "assets/icon.svg",
   "assets/apple-touch-icon.svg"
 ];

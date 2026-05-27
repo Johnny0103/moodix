@@ -1,11 +1,11 @@
 {
-  "name": "CareCircle",
-  "short_name": "CareCircle",
-  "description": "Shared care coordination for families managing an aging parent.",
+  "name": "Moodix",
+  "short_name": "Moodix",
+  "description": "Daily mood-based song recommendations from your own playlists.",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#fbfaf6",
-  "theme_color": "#226f68",
+  "background_color": "#101321",
+  "theme_color": "#101321",
   "icons": [
     {
       "src": "assets/icon.svg",
