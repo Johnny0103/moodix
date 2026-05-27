@@ -108,11 +108,12 @@ function addScore(scores, word, amount) {
 }
 
 function analyzeDay(formData) {
-  const text = normalize(`${formData.get("plans")} ${formData.get("mind")}`);
+  const text = normalize(`${formData.get("plans")} ${formData.get("mind")} ${formData.get("success")}`);
   const pace = formData.get("pace");
   const setting = formData.get("setting");
   const company = formData.get("company");
   const need = formData.get("need");
+  const texture = formData.get("texture");
   const scores = {
     Focused: 0,
     Restorative: 0,
@@ -144,10 +145,15 @@ function analyzeDay(formData) {
   if (need === "feel") addScore(scores, "Tender", 3), addScore(scores, "Reflective", 3);
   if (need === "move") addScore(scores, "Electric", 5);
 
+  if (texture === "clean") addScore(scores, "Focused", 4);
+  if (texture === "warm") addScore(scores, "Tender", 3), addScore(scores, "Grounded", 2);
+  if (texture === "open") addScore(scores, "Electric", 3), addScore(scores, "Bright", 2);
+  if (texture === "soft") addScore(scores, "Restorative", 4);
+
   const keywordMap = {
-    Focused: ["deadline", "exam", "study", "class", "work", "project", "focus"],
-    Restorative: ["rest", "sleep", "tired", "drained", "recover", "quiet", "break"],
-    Bright: ["excited", "friends", "party", "sun", "happy", "fun", "celebrate"],
+    Focused: ["deadline", "exam", "study", "class", "work", "project", "focus", "done", "progress"],
+    Restorative: ["rest", "sleep", "tired", "drained", "recover", "quiet", "break", "lighter"],
+    Bright: ["excited", "friends", "party", "sun", "happy", "fun", "celebrate", "better"],
     Tender: ["date", "love", "miss", "family", "heart", "person", "care"],
     Electric: ["gym", "run", "workout", "busy", "drive", "errands", "move"],
     Grounded: ["home", "clean", "cook", "routine", "steady", "simple", "calm"],
@@ -165,12 +171,30 @@ function analyzeDay(formData) {
 
   return {
     word,
+    detail: analysisDetail(word, formData),
     weekday: now.toLocaleDateString(undefined, { weekday: "long" }),
     date: now.toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" }),
     time: now.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" }),
     answers: Object.fromEntries(formData.entries()),
     profile: wordProfiles[word]
   };
+}
+
+function analysisDetail(word, formData) {
+  const needLabels = {
+    focus: "focus",
+    lift: "lift",
+    settle: "calm",
+    feel: "emotional space",
+    move: "momentum"
+  };
+  const settingLabels = {
+    home: "home",
+    work: "work or school",
+    outside: "movement",
+    social: "people"
+  };
+  return `Because you pointed toward ${settingLabels[formData.get("setting")] || "today"} and asked music for ${needLabels[formData.get("need")] || "support"}, Moodix reads the day as ${word.toLowerCase()}.`;
 }
 
 function setupDayForm() {
@@ -185,6 +209,7 @@ function setupDayForm() {
 
     document.querySelector("[data-day-word]").textContent = analysis.word;
     document.querySelector("[data-day-summary]").textContent = `${analysis.weekday} reads as ${analysis.word.toLowerCase()}. Moodix will use that word to shape your top five songs.`;
+    document.querySelector("[data-analysis-detail]").textContent = analysis.detail;
     card.hidden = false;
     card.scrollIntoView({ behavior: "smooth", block: "center" });
   });

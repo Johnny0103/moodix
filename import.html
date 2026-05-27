@@ -28,7 +28,7 @@
     <main>
       <section class="flow-hero compact-flow" aria-labelledby="import-title">
         <div>
-          <p class="eyebrow">Upload music</p>
+          <p class="eyebrow">Step 2 / Upload music</p>
           <h1 id="import-title">Choose where your songs come from.</h1>
           <p class="hero-copy" data-import-context>Your Moodix word will shape the ranking.</p>
         </div>
@@ -40,12 +40,18 @@
       </section>
 
       <section class="section upload-page-section">
+        <div class="flow-progress" aria-label="Moodix flow progress">
+          <span> Mood</span>
+          <span class="active">Music</span>
+          <span>Top 5</span>
+          <span>App</span>
+        </div>
         <div class="source-picker" aria-label="Prototype music source options">
-          <button class="source-card active" type="button" data-source="Spotify">Spotify</button>
-          <button class="source-card" type="button" data-source="Apple Music">Apple Music</button>
-          <button class="source-card" type="button" data-source="YouTube Music">YouTube Music</button>
-          <button class="source-card" type="button" data-source="SoundCloud">SoundCloud</button>
-          <button class="source-card" type="button" data-source="Other">Other</button>
+          <button class="source-card active" type="button" data-source="Spotify"><span>Spotify</span><small>CSV export or copied tracks</small></button>
+          <button class="source-card" type="button" data-source="Apple Music"><span>Apple Music</span><small>Library export or pasted list</small></button>
+          <button class="source-card" type="button" data-source="YouTube Music"><span>YouTube Music</span><small>Playlist text or export</small></button>
+          <button class="source-card" type="button" data-source="SoundCloud"><span>SoundCloud</span><small>Liked tracks or playlist rows</small></button>
+          <button class="source-card" type="button" data-source="Other"><span>Other</span><small>Any title and artist list</small></button>
         </div>
 
         <div class="upload-layout">
@@ -66,6 +72,7 @@ Intro, The xx, focused, medium, indie electronic, work</textarea>
           <section class="single-results" aria-labelledby="results-title">
             <p class="eyebrow">Moodix result</p>
             <h2 id="results-title">Your top five will appear here.</h2>
+            <p class="result-intro">Moodix ranks one daily set from the word it inferred on the previous page.</p>
             <div class="results-grid single" data-results-grid></div>
             <a class="button secondary dark" href="app-version.html" data-app-version-link hidden>Next: app version</a>
           </section>
@@ -73,6 +80,6 @@ Intro, The xx, focused, medium, indie electronic, work</textarea>
       </section>
     </main>
 
-    <script src="app.js?v=2" defer></script>
+    <script src="app.js?v=3" defer></script>
   </body>
 </html>

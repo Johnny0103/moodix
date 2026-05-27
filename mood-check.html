@@ -28,7 +28,7 @@
     <main>
       <section class="flow-hero" aria-labelledby="check-title">
         <div>
-          <p class="eyebrow">Mood check</p>
+          <p class="eyebrow">Step 1 / Mood check</p>
           <h1 id="check-title">What kind of day is this?</h1>
           <p class="hero-copy">Moodix uses your local time to anchor the check-in, then reads your answers into one word.</p>
         </div>
@@ -40,6 +40,12 @@
       </section>
 
       <section class="section question-section" aria-labelledby="question-title">
+        <div class="flow-progress" aria-label="Moodix flow progress">
+          <span class="active">Mood</span>
+          <span>Music</span>
+          <span>Top 5</span>
+          <span>App</span>
+        </div>
         <div class="section-heading compact">
           <p class="eyebrow">A few personal questions</p>
           <h2 id="question-title">Answer casually. Moodix will infer the mood.</h2>
@@ -85,6 +91,17 @@
           <label for="mind">Anything sitting on your mind?</label>
           <textarea id="mind" name="mind" rows="3" placeholder="A deadline, a person, excitement, stress, nothing much..."></textarea>
 
+          <label for="success">What would make today feel successful?</label>
+          <textarea id="success" name="success" rows="3" placeholder="Getting one thing done, feeling lighter, making progress, having fun..."></textarea>
+
+          <label for="texture">Which space sounds closest to what you need?</label>
+          <select id="texture" name="texture">
+            <option value="clean">Clean, focused, and distraction-free</option>
+            <option value="warm">Warm, emotional, and personal</option>
+            <option value="open">Open, moving, and outside my head</option>
+            <option value="soft">Soft, quiet, and low-pressure</option>
+          </select>
+
           <button class="button primary" type="submit">Analyze my day</button>
         </form>
 
@@ -92,11 +109,14 @@
           <p class="eyebrow">Moodix word</p>
           <h2 data-day-word>Focused</h2>
           <p data-day-summary>Your day has a steady, focused shape.</p>
+          <div class="analysis-detail">
+            <span data-analysis-detail>Playlist matching will use this as the emotional filter.</span>
+          </div>
           <a class="button primary" href="import.html">Choose music upload option</a>
         </article>
       </section>
     </main>
 
-    <script src="app.js?v=2" defer></script>
+    <script src="app.js?v=3" defer></script>
   </body>
 </html>
