@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" role="img" aria-label="CareCircle icon">
+  <rect width="180" height="180" rx="40" fill="#226f68"/>
+  <path d="M90 41c23 0 41 18 41 41 0 34-41 57-41 57S49 116 49 82c0-23 18-41 41-41Z" fill="#fbfaf6"/>
+  <path d="M90 64v52M64 90h52" stroke="#226f68" stroke-width="14" stroke-linecap="round"/>
+</svg>
