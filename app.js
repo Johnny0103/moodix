@@ -4,7 +4,9 @@ const storageKeys = {
   source: "moodix_music_source",
   tracks: "moodix_playlist_tracks",
   logo: "moodix_logo_choice",
-  waitlist: "moodix_app_waitlist"
+  waitlist: "moodix_app_waitlist",
+  checkMode: "moodix_check_mode",
+  weekAnalysis: "moodix_week_analysis"
 };
 
 const memoryStorage = {};
@@ -157,6 +159,7 @@ function getUser() {
 function setupSignin() {
   const form = document.querySelector("[data-signin-form]");
   const note = document.querySelector("[data-signin-note]");
+  const overlay = document.querySelector("[data-emotion-overlay]");
   const user = getUser();
 
   if (user) {
@@ -164,6 +167,10 @@ function setupSignin() {
     document.querySelector("[data-signed-in-note]")?.replaceChildren(`Signed in as ${user.name || user.email}. Choose a step below.`);
     document.querySelectorAll("[data-step-link]").forEach((link) => link.classList.remove("locked"));
     if (note) note.textContent = "You are signed in for this prototype.";
+    if (form) {
+      form.elements.namedItem("name").value = user.name || "";
+      form.elements.namedItem("email").value = user.email || "";
+    }
   }
 
   form?.addEventListener("submit", (event) => {
@@ -178,7 +185,17 @@ function setupSignin() {
     document.body.classList.add("is-signed-in");
     document.querySelectorAll("[data-step-link]").forEach((link) => link.classList.remove("locked"));
     document.querySelector("[data-signed-in-note]")?.replaceChildren(`Signed in as ${userData.name || userData.email}. Choose a step below.`);
-    note.textContent = "Signed in. Start with Mood check.";
+    if (note) note.textContent = "Signed in. Listen to your emotion.";
+    if (overlay) {
+      overlay.hidden = false;
+      overlay.classList.add("active");
+      document.body.classList.add("show-emotion-overlay");
+      window.setTimeout(() => {
+        window.location.href = "mood-check.html";
+      }, 5000);
+    } else {
+      window.location.href = "mood-check.html";
+    }
   });
 }
 
@@ -203,8 +220,7 @@ function addScore(scores, word, amount) {
   scores[word] = (scores[word] || 0) + amount;
 }
 
-function analyzeDay(formData) {
-  const meta = getLocalDayMeta();
+function analyzeDay(formData, meta = getLocalDayMeta()) {
   const text = normalize(`${formData.get("plans")} ${formData.get("mind")} ${formData.get("success")}`);
   const scores = {
     Focused: 0,
@@ -291,12 +307,144 @@ function setupDayForm() {
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     const analysis = analyzeDay(new FormData(form));
+    storageSet(storageKeys.checkMode, "today");
     setJSON(storageKeys.analysis, analysis);
     document.querySelector("[data-day-word]").textContent = analysis.word;
     document.querySelector("[data-day-summary]").textContent = `${analysis.weekday} reads as ${analysis.word.toLowerCase()}. Moodix saved this for ${analysis.date}.`;
     document.querySelector("[data-analysis-detail]").textContent = analysis.detail;
     card.hidden = false;
     card.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+}
+
+function setupMoodMode() {
+  const choices = document.querySelectorAll("[data-mode-choice]");
+  const panels = document.querySelectorAll("[data-mode-panel]");
+  if (!choices.length) return;
+
+  const setMode = (mode) => {
+    storageSet(storageKeys.checkMode, mode);
+    choices.forEach((choice) => choice.classList.toggle("active", choice.dataset.modeChoice === mode));
+    panels.forEach((panel) => {
+      panel.hidden = panel.dataset.modePanel !== mode;
+    });
+    document.querySelector("[data-analysis-card]")?.setAttribute("hidden", "");
+    document.querySelector("[data-week-summary]")?.setAttribute("hidden", "");
+  };
+
+  choices.forEach((choice) => {
+    choice.addEventListener("click", () => setMode(choice.dataset.modeChoice));
+  });
+
+  setMode(storageGet(storageKeys.checkMode) || "today");
+}
+
+function weekDates() {
+  const today = new Date();
+  return Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(today);
+    date.setDate(today.getDate() + index);
+    return {
+      stamp: localDayStamp(date),
+      weekday: date.toLocaleDateString(undefined, { weekday: "long" }),
+      date: date.toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" }),
+      time: today.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" }),
+      label: index === 0 ? "Today" : date.toLocaleDateString(undefined, { month: "short", day: "numeric" })
+    };
+  });
+}
+
+function renderWeekSummary(days) {
+  const summary = document.querySelector("[data-week-summary]");
+  const list = document.querySelector("[data-week-summary-list]");
+  if (!summary || !list || !days?.length) return;
+  list.innerHTML = days.map((day) => `
+    <div>
+      <strong>${day.weekday}</strong>
+      <small>${day.label || day.stamp}</small>
+      <span>${day.analysis.word}</span>
+    </div>
+  `).join("");
+  summary.hidden = false;
+}
+
+function setupWeekForm() {
+  const grid = document.querySelector("[data-week-grid]");
+  const form = document.querySelector("[data-week-form]");
+  const summary = document.querySelector("[data-week-summary]");
+  if (!grid || !form) return;
+
+  grid.innerHTML = weekDates().map((day, index) => `
+    <article class="week-day-card">
+      <div>
+        <span>${day.label}</span>
+        <h3>${day.weekday}</h3>
+      </div>
+      <label for="week-${index}-feeling">Expected energy</label>
+      <select id="week-${index}-feeling" name="day-${index}-feeling">
+        <option value="steady">Steady</option>
+        <option value="light">Light</option>
+        <option value="heavy">Heavy</option>
+        <option value="restless">Restless</option>
+        <option value="tender">Tender</option>
+      </select>
+      <label for="week-${index}-plans">What might happen?</label>
+      <textarea id="week-${index}-plans" name="day-${index}-plans" rows="2" placeholder="Work, class, rest, gym, seeing people..."></textarea>
+      <label for="week-${index}-setting">Where will this day mostly happen?</label>
+      <select id="week-${index}-setting" name="day-${index}-setting">
+        <option value="work">Work or school</option>
+        <option value="home">Mostly at home</option>
+        <option value="outside">Moving around outside</option>
+        <option value="social">Around people</option>
+      </select>
+      <label for="week-${index}-need">Music should help with</label>
+      <select id="week-${index}-need" name="day-${index}-need">
+        <option value="focus">Focus</option>
+        <option value="lift">Lift</option>
+        <option value="settle">Settle</option>
+        <option value="feel">Feel</option>
+        <option value="move">Move</option>
+      </select>
+      <label for="week-${index}-success">What would make it feel successful?</label>
+      <textarea id="week-${index}-success" name="day-${index}-success" rows="2" placeholder="A win, a quiet night, seeing someone, moving forward..."></textarea>
+    </article>
+  `).join("");
+
+  const storedWeek = getJSON(storageKeys.weekAnalysis);
+  if (storageGet(storageKeys.checkMode) === "week" && storedWeek?.days?.length && storedWeek.days[0]?.stamp === weekDates()[0].stamp) {
+    renderWeekSummary(storedWeek.days);
+  }
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const data = new FormData(form);
+    const days = weekDates().map((day, index) => {
+      const synthetic = new FormData();
+      synthetic.set("feeling", data.get(`day-${index}-feeling`) || "steady");
+      synthetic.set("plans", data.get(`day-${index}-plans`) || "");
+      synthetic.set("need", data.get(`day-${index}-need`) || "focus");
+      synthetic.set("pace", "steady");
+      synthetic.set("setting", data.get(`day-${index}-setting`) || "work");
+      synthetic.set("company", "solo");
+      synthetic.set("success", data.get(`day-${index}-success`) || data.get(`day-${index}-plans`) || "");
+      synthetic.set("mind", "");
+      const analysis = analyzeDay(synthetic, day);
+      return {
+        ...day,
+        analysis
+      };
+    });
+    storageSet(storageKeys.checkMode, "week");
+    if (days[0]?.analysis) setJSON(storageKeys.analysis, days[0].analysis);
+    setJSON(storageKeys.weekAnalysis, {
+      createdAt: new Date().toISOString(),
+      weekOf: days[0]?.stamp,
+      days
+    });
+    renderWeekSummary(days);
+    if (summary) {
+      summary.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
   });
 }
 
@@ -518,6 +666,8 @@ setupLocalTime();
 setupSignin();
 requireSignin();
 setupDayForm();
+setupMoodMode();
+setupWeekForm();
 setupImportContext();
 setupSourceChips();
 setupIntentButtons();

@@ -37,7 +37,7 @@
           <p class="eyebrow">Personal music mood flow</p>
           <h1 id="hero-title">Sign in. Read today. Play the right five.</h1>
           <p class="hero-copy">
-            Moodix uses your local weekday, a short emotional check-in, and your music source to build one daily word and five songs for today.
+            Moodix is a website that reads the emotional context of your day, then helps the future app recommend music that fits what you actually need. Sign in here, check your mood, and later connect music for your daily soundtrack.
           </p>
         </div>
       </section>
@@ -46,7 +46,7 @@
         <div class="section-heading compact">
           <p class="eyebrow">Start here</p>
           <h2 id="signin-title">Sign in to unlock today's steps.</h2>
-          <p data-signed-in-note>Prototype sign-in stores your name and email in this browser only.</p>
+          <p data-signed-in-note>Prototype sign-in stores your name and email in this browser only. Daily song emails will be connected after the result flow is finalized.</p>
         </div>
 
         <div class="signin-layout">
@@ -85,11 +85,23 @@
       </section>
     </main>
 
+    <div class="emotion-overlay" data-emotion-overlay hidden aria-live="polite">
+      <div class="emotion-pulse" aria-hidden="true"></div>
+      <div class="emotion-clip">
+        <span class="emoji-orbit" aria-hidden="true">🎧</span>
+        <span class="emoji-orbit delay-one" aria-hidden="true">🎵</span>
+        <span class="emoji-orbit delay-two" aria-hidden="true">💖</span>
+        <span class="emoji-orbit delay-three" aria-hidden="true">✨</span>
+        <p>Listen to your emotion</p>
+        <small>Preparing today's mood check...</small>
+      </div>
+    </div>
+
     <footer class="site-footer">
       <span>Moodix</span>
       <a href="mood-check.html">Start today's flow</a>
     </footer>
 
-    <script src="app.js?v=4" defer></script>
+    <script src="app.js?v=5" defer></script>
   </body>
 </html>

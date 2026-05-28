@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#101321">
-    <meta name="description" content="Answer Moodix questions and get today's emotional analysis.">
-    <title>Moodix | Step 1 mood check</title>
+    <meta name="description" content="Choose today's mood check or predict a whole week with Moodix.">
+    <title>Moodix | Mood check</title>
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="assets/apple-touch-icon.svg">
@@ -30,8 +30,8 @@
       <section class="flow-hero" aria-labelledby="check-title">
         <div>
           <p class="eyebrow">Step 1 / Mood check</p>
-          <h1 id="check-title">How do you feel today?</h1>
-          <p class="hero-copy">Start simple, then answer context questions so Moodix can infer the deeper emotional shape of your day.</p>
+          <h1 id="check-title">What do you want Moodix to read?</h1>
+          <p class="hero-copy">Start with today or map the whole week. Moodix uses your local date and timezone so the check-in matches the day you are actually in.</p>
         </div>
         <aside class="today-card">
           <span data-local-weekday>Today</span>
@@ -40,19 +40,34 @@
         </aside>
       </section>
 
-      <section class="section question-section" aria-labelledby="question-title">
+      <section class="section question-section" aria-labelledby="mode-title">
         <div class="flow-progress" aria-label="Moodix flow progress">
           <span class="active">Mood</span>
           <span>Import</span>
           <span>Result</span>
           <span>App</span>
         </div>
+
         <div class="section-heading compact">
-          <p class="eyebrow">Emotional analyzing AI</p>
-          <h2 id="question-title">Moodix asks indirectly, then gives one word.</h2>
+          <p class="eyebrow">Choose your check-in</p>
+          <h2 id="mode-title">One day or the whole week?</h2>
+          <p>Both paths ask indirectly. Moodix analyzes the answers into emotional words that can guide music later.</p>
         </div>
 
-        <form class="question-card" data-day-form>
+        <div class="mode-choice-grid">
+          <button class="mode-choice active" type="button" data-mode-choice="today">
+            <span>Today</span>
+            <strong>Fill in today</strong>
+            <small>Best for a quick daily song match.</small>
+          </button>
+          <button class="mode-choice" type="button" data-mode-choice="week">
+            <span>Week</span>
+            <strong>Predict the whole week</strong>
+            <small>Best for planning the emotional rhythm ahead.</small>
+          </button>
+        </div>
+
+        <form class="question-card" data-day-form data-mode-panel="today">
           <fieldset class="feeling-options">
             <legend>How do you feel today?</legend>
             <label><input type="radio" name="feeling" value="light" checked> Light</label>
@@ -104,11 +119,16 @@
           <label for="mind">Anything sitting on your mind?</label>
           <textarea id="mind" name="mind" rows="3" placeholder="A deadline, a person, excitement, stress, nothing much..."></textarea>
 
-          <button class="button primary" type="submit">Analyze my emotion</button>
+          <button class="button primary" type="submit">Analyze today</button>
+        </form>
+
+        <form class="week-card" data-week-form data-mode-panel="week" hidden>
+          <div class="week-grid" data-week-grid></div>
+          <button class="button primary" type="submit">Analyze my week</button>
         </form>
 
         <article class="analysis-card" data-analysis-card hidden>
-          <p class="eyebrow">Saved for today's local date</p>
+          <p class="eyebrow">Saved for your local timezone</p>
           <h2 data-day-word>Focused</h2>
           <p data-day-summary>Your day has a focused shape.</p>
           <div class="analysis-detail">
@@ -116,9 +136,16 @@
           </div>
           <a class="button primary" href="import.html">Continue to import</a>
         </article>
+
+        <article class="analysis-card" data-week-summary hidden>
+          <p class="eyebrow">Weekly prediction saved</p>
+          <h2>Your week has a mood map.</h2>
+          <div class="week-summary-list" data-week-summary-list></div>
+          <a class="button primary" href="import.html">Continue to import</a>
+        </article>
       </section>
     </main>
 
-    <script src="app.js?v=4" defer></script>
+    <script src="app.js?v=5" defer></script>
   </body>
 </html>

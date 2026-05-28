@@ -1,4 +1,4 @@
-const CACHE_NAME = "moodix-v4";
+const CACHE_NAME = "moodix-v5";
 const ASSETS = [
   "./",
   "index.html",
@@ -8,7 +8,7 @@ const ASSETS = [
   "app-version.html",
   "signup.html",
   "styles.css",
-  "app.js?v=4",
+  "app.js?v=5",
   "manifest.webmanifest",
   "assets/moodix-hero.png",
   "assets/icon.svg",
@@ -32,5 +32,13 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  event.respondWith(caches.match(event.request).then((cached) => cached || fetch(event.request)));
+  event.respondWith(
+    fetch(event.request)
+      .then((response) => {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+        return response;
+      })
+      .catch(() => caches.match(event.request))
+  );
 });

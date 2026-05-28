@@ -30,6 +30,10 @@ body {
   color: var(--text);
 }
 
+body.show-emotion-overlay {
+  overflow: hidden;
+}
+
 button,
 input,
 select,
@@ -267,6 +271,115 @@ h3 {
   border-radius: 8px;
   background: var(--panel);
   padding: 24px;
+}
+
+.emotion-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(22, 217, 189, 0.28), transparent 28%),
+    linear-gradient(135deg, rgba(16, 19, 33, 0.98), rgba(24, 29, 49, 0.96));
+  color: var(--ink);
+}
+
+.emotion-pulse {
+  position: absolute;
+  width: min(72vw, 580px);
+  aspect-ratio: 1;
+  border: 2px solid rgba(22, 217, 189, 0.42);
+  border-radius: 50%;
+  box-shadow:
+    0 0 80px rgba(22, 217, 189, 0.32),
+    inset 0 0 70px rgba(91, 124, 250, 0.2);
+  animation: pulse-ring 1.8s ease-in-out infinite;
+}
+
+.emotion-clip {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(660px, calc(100vw - 32px));
+  min-height: 360px;
+  text-align: center;
+}
+
+.emotion-clip p {
+  margin: 0;
+  text-shadow: 0 0 32px rgba(22, 217, 189, 0.55);
+  font-size: clamp(3rem, 9vw, 7rem);
+  font-weight: 1000;
+  line-height: 0.95;
+}
+
+.emotion-clip small {
+  margin-top: 22px;
+  color: rgba(248, 251, 255, 0.72);
+  font-weight: 800;
+}
+
+.emoji-orbit {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.22);
+  font-size: 1.75rem;
+  animation: float-emoji 4.8s ease-in-out infinite;
+}
+
+.emoji-orbit:nth-of-type(1) {
+  top: 18px;
+  left: 15%;
+}
+
+.emoji-orbit.delay-one {
+  top: 60px;
+  right: 13%;
+  animation-delay: 0.5s;
+}
+
+.emoji-orbit.delay-two {
+  bottom: 44px;
+  left: 18%;
+  animation-delay: 1s;
+}
+
+.emoji-orbit.delay-three {
+  right: 20%;
+  bottom: 22px;
+  animation-delay: 1.5s;
+}
+
+@keyframes pulse-ring {
+  0%,
+  100% {
+    transform: scale(0.82);
+    opacity: 0.55;
+  }
+
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
+@keyframes float-emoji {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-18px) rotate(8deg);
+  }
 }
 
 .signin-card label {
@@ -514,6 +627,64 @@ h3 {
   padding: 26px;
 }
 
+.mode-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  max-width: 920px;
+  margin-bottom: 20px;
+}
+
+.mode-choice {
+  min-height: 154px;
+  cursor: pointer;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+  padding: 22px;
+  text-align: left;
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.mode-choice:hover {
+  transform: translateY(-2px);
+}
+
+.mode-choice.active {
+  border-color: var(--teal);
+  box-shadow: 0 18px 42px rgba(22, 217, 189, 0.15), inset 0 0 0 2px rgba(22, 217, 189, 0.2);
+}
+
+.mode-choice span {
+  display: inline-grid;
+  place-items: center;
+  min-width: 58px;
+  min-height: 32px;
+  margin-bottom: 20px;
+  border-radius: 6px;
+  background: #edfdfa;
+  color: #007866;
+  font-size: 0.78rem;
+  font-weight: 1000;
+  text-transform: uppercase;
+}
+
+.mode-choice strong,
+.mode-choice small {
+  display: block;
+}
+
+.mode-choice strong {
+  font-size: 1.22rem;
+}
+
+.mode-choice small {
+  margin-top: 8px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
 .feeling-options {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -568,6 +739,101 @@ h3 {
   min-height: 112px;
   padding: 12px;
   resize: vertical;
+}
+
+.week-card {
+  max-width: 1120px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  padding: 24px;
+}
+
+.week-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.week-day-card {
+  display: grid;
+  gap: 10px;
+  border: 1px solid #e8edf7;
+  border-radius: 8px;
+  background: #fbfcff;
+  padding: 18px;
+}
+
+.week-day-card > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: baseline;
+}
+
+.week-day-card span {
+  color: var(--blue);
+  font-size: 0.78rem;
+  font-weight: 1000;
+  text-transform: uppercase;
+}
+
+.week-day-card h3 {
+  margin: 0;
+}
+
+.week-day-card label {
+  color: #293147;
+  font-weight: 900;
+}
+
+.week-day-card select,
+.week-day-card textarea {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--text);
+  padding: 0 12px;
+}
+
+.week-day-card textarea {
+  min-height: 82px;
+  padding: 12px;
+  resize: vertical;
+}
+
+.week-summary-list {
+  display: grid;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.week-summary-list div {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) minmax(80px, 0.6fr) auto;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid #edf0f7;
+  border-radius: 8px;
+  background: #fbfcff;
+  padding: 12px;
+}
+
+.week-summary-list small {
+  color: var(--muted);
+}
+
+.week-summary-list span {
+  justify-self: end;
+  border-radius: 6px;
+  background: #eefdf9;
+  color: #007866;
+  font-size: 0.86rem;
+  font-weight: 1000;
+  padding: 7px 10px;
 }
 
 .analysis-card {
@@ -886,7 +1152,9 @@ h3 {
   .logo-grid,
   .step-launcher,
   .feeling-options,
-  .source-picker {
+  .source-picker,
+  .mode-choice-grid,
+  .week-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -914,6 +1182,14 @@ h3 {
 
   .button {
     width: 100%;
+  }
+
+  .week-summary-list div {
+    grid-template-columns: 1fr;
+  }
+
+  .week-summary-list span {
+    justify-self: start;
   }
 }
 
