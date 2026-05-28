@@ -280,7 +280,9 @@ function setupSignin() {
 
   if (user) {
     document.body.classList.add("is-signed-in");
-    document.querySelector("[data-signed-in-note]")?.replaceChildren(`Signed in as ${user.name || user.email}. Choose a step below.`);
+    document.querySelectorAll("[data-signed-in-note]").forEach((item) => {
+      item.replaceChildren(`Signed in as ${user.name || user.email}. Choose a step below.`);
+    });
     document.querySelectorAll("[data-step-link]").forEach((link) => link.classList.remove("locked"));
     if (note) note.textContent = "You are signed in for this prototype.";
     if (form) {
@@ -300,7 +302,9 @@ function setupSignin() {
     setJSON(storageKeys.user, userData);
     document.body.classList.add("is-signed-in");
     document.querySelectorAll("[data-step-link]").forEach((link) => link.classList.remove("locked"));
-    document.querySelector("[data-signed-in-note]")?.replaceChildren(`Signed in as ${userData.name || userData.email}. Choose a step below.`);
+    document.querySelectorAll("[data-signed-in-note]").forEach((item) => {
+      item.replaceChildren(`Signed in as ${userData.name || userData.email}. Choose a step below.`);
+    });
     if (note) note.textContent = "Signed in. Listen to your emotion.";
     if (overlay) {
       overlay.hidden = false;
@@ -1065,6 +1069,6 @@ document.querySelector("[data-save-import]")?.addEventListener("click", saveImpo
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=7").catch(() => {});
   });
 }
