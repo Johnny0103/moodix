@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#101321">
+    <meta name="theme-color" content="#20150f">
     <meta name="description" content="Connect or upload music into Moodix for today's top-five result.">
     <title>Moodix | Step 2 import music</title>
     <link rel="manifest" href="manifest.webmanifest">
@@ -51,17 +51,31 @@
         <div class="section-heading compact">
           <p class="eyebrow">Music authorization</p>
           <h2>Choose a provider or upload manually.</h2>
-          <p>Provider cards simulate authorization for this GitHub Pages prototype. CSV and pasted tracks power the working result.</p>
+          <p>Spotify can connect with PKCE once your Spotify Client ID is added. CSV and pasted tracks remain the working fallback.</p>
         </div>
 
         <div class="source-picker" aria-label="Prototype music source options">
-          <button class="source-card active" type="button" data-source="Spotify"><span>Spotify</span><small>OAuth-ready PKCE hook</small></button>
+          <button class="source-card active" type="button" data-source="Spotify"><span>Spotify</span><small>PKCE connect path</small></button>
           <button class="source-card" type="button" data-source="Apple Music"><span>Apple Music</span><small>MusicKit authorization hook</small></button>
-          <button class="source-card" type="button" data-source="YouTube Music"><span>YouTube Music</span><small>YouTube OAuth hook</small></button>
+          <button class="source-card" type="button" data-source="YouTube Music"><span>YouTube Music</span><small>Setup guide for later</small></button>
         </div>
 
         <div class="upload-layout">
           <div class="upload-box">
+            <div class="spotify-connect-card">
+              <div>
+                <p class="eyebrow">Spotify direct import</p>
+                <h3>Connect your Spotify playlists.</h3>
+                <p data-spotify-status>Add a Spotify Client ID in app.js to activate the live connect button.</p>
+              </div>
+              <button class="button primary" type="button" data-spotify-connect>Connect Spotify</button>
+              <div class="spotify-playlists" data-spotify-playlists hidden></div>
+              <p class="helper-text">
+                Redirect URI to add in Spotify Dashboard:
+                <strong>https://johnny0103.github.io/moodix/import.html</strong>
+              </p>
+            </div>
+
             <label for="playlist-file">CSV file</label>
             <input id="playlist-file" type="file" accept=".csv,text/csv,text/plain" data-playlist-file>
             <label for="playlist-paste">Paste tracks</label>
@@ -77,14 +91,28 @@ Intro, The xx, focused, medium, indie electronic, work</textarea>
 
           <section class="auth-panel" aria-labelledby="auth-title">
             <p class="eyebrow">Connection status</p>
-            <h2 id="auth-title">Ready for static prototype matching.</h2>
-            <p data-auth-note>Choose a source, then save your playlist rows. Moodix will use them on the result page.</p>
+            <h2 id="auth-title">Ready for Spotify or manual matching.</h2>
+            <p data-auth-note>Spotify uses Authorization Code with PKCE and no client secret in the browser. YouTube Music stays as setup guidance for now.</p>
+            <div class="auth-steps">
+              <strong>To authorize Spotify</strong>
+              <ol>
+                <li>Create a Spotify Developer app.</li>
+                <li>Add the redirect URI shown on this page.</li>
+                <li>Copy the Client ID into the Moodix Spotify config.</li>
+              </ol>
+              <strong>For YouTube later</strong>
+              <ol>
+                <li>Create a Google Cloud OAuth client.</li>
+                <li>Enable the YouTube Data API.</li>
+                <li>Use YouTube playlist scopes; YouTube Music itself has no simple public playlist import API here.</li>
+              </ol>
+            </div>
             <a class="button secondary dark" href="result.html" data-result-link hidden>Continue to result</a>
           </section>
         </div>
       </section>
     </main>
 
-    <script src="app.js?v=5" defer></script>
+    <script src="app.js?v=6" defer></script>
   </body>
 </html>

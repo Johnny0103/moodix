@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#101321">
+    <meta name="theme-color" content="#20150f">
     <meta name="description" content="Choose today's mood check or predict a whole week with Moodix.">
     <title>Moodix | Mood check</title>
     <link rel="manifest" href="manifest.webmanifest">
@@ -67,59 +67,17 @@
           </button>
         </div>
 
-        <form class="question-card" data-day-form data-mode-panel="today">
-          <fieldset class="feeling-options">
-            <legend>How do you feel today?</legend>
-            <label><input type="radio" name="feeling" value="light" checked> Light</label>
-            <label><input type="radio" name="feeling" value="steady"> Steady</label>
-            <label><input type="radio" name="feeling" value="heavy"> Heavy</label>
-            <label><input type="radio" name="feeling" value="restless"> Restless</label>
-            <label><input type="radio" name="feeling" value="tender"> Tender</label>
-          </fieldset>
-
-          <label for="plans">What are you doing today?</label>
-          <textarea id="plans" name="plans" rows="3" placeholder="Classes, work, errands, gym, meeting someone, resting, studying..."></textarea>
-
-          <label for="pace">What pace would help today feel better?</label>
-          <select id="pace" name="pace">
-            <option value="steady">Steady and manageable</option>
-            <option value="slow">Slow and soft</option>
-            <option value="bright">Upbeat and bright</option>
-            <option value="intense">Fast and intense</option>
-          </select>
-
-          <label for="setting">Where will most of today happen?</label>
-          <select id="setting" name="setting">
-            <option value="home">Mostly at home</option>
-            <option value="work">Work or school</option>
-            <option value="outside">Moving around outside</option>
-            <option value="social">Around people</option>
-          </select>
-
-          <label for="company">Who are you mostly around?</label>
-          <select id="company" name="company">
-            <option value="solo">Mostly myself</option>
-            <option value="team">Classmates or coworkers</option>
-            <option value="friends">Friends or family</option>
-            <option value="someone">Someone I care about</option>
-          </select>
-
-          <label for="need">What should music quietly do for you?</label>
-          <select id="need" name="need">
-            <option value="focus">Keep me focused</option>
-            <option value="lift">Lift me up</option>
-            <option value="settle">Settle me down</option>
-            <option value="feel">Let me feel things</option>
-            <option value="move">Push my energy forward</option>
-          </select>
-
-          <label for="success">What would make today feel successful?</label>
-          <textarea id="success" name="success" rows="3" placeholder="Making progress, feeling lighter, getting one thing done, having fun..."></textarea>
-
-          <label for="mind">Anything sitting on your mind?</label>
-          <textarea id="mind" name="mind" rows="3" placeholder="A deadline, a person, excitement, stress, nothing much..."></textarea>
-
-          <button class="button primary" type="submit">Analyze today</button>
+        <form class="question-card mood-wizard" data-day-form data-mode-panel="today">
+          <div class="wizard-question" data-wizard-question></div>
+          <div class="wizard-progress" aria-live="polite">
+            <div class="wizard-progress-top">
+              <span data-wizard-percent>0% complete</span>
+              <small data-wizard-left>8 questions left</small>
+            </div>
+            <div class="wizard-progress-track" aria-hidden="true">
+              <span data-wizard-bar></span>
+            </div>
+          </div>
         </form>
 
         <form class="week-card" data-week-form data-mode-panel="week" hidden>
@@ -146,6 +104,6 @@
       </section>
     </main>
 
-    <script src="app.js?v=5" defer></script>
+    <script src="app.js?v=6" defer></script>
   </body>
 </html>

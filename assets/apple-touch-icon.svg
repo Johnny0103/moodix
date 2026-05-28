@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" role="img" aria-label="Moodix icon">
-  <rect width="180" height="180" rx="40" fill="#101321"/>
-  <path d="M39 109c15 16 30 24 47 24 20 0 34-11 43-33" fill="none" stroke="#00c2a8" stroke-width="12" stroke-linecap="round"/>
-  <path d="M42 73c10-16 23-24 38-24s26 7 34 23c6 12 14 19 25 19" fill="none" stroke="#ff6b6b" stroke-width="12" stroke-linecap="round"/>
+  <rect width="180" height="180" rx="40" fill="#20150f"/>
+  <path d="M39 109c15 16 30 24 47 24 20 0 34-11 43-33" fill="none" stroke="#ffb000" stroke-width="12" stroke-linecap="round"/>
+  <path d="M42 73c10-16 23-24 38-24s26 7 34 23c6 12 14 19 25 19" fill="none" stroke="#f97316" stroke-width="12" stroke-linecap="round"/>
   <circle cx="57" cy="80" r="8" fill="#ffd166"/>
   <circle cx="124" cy="101" r="8" fill="#5b7cfa"/>
-  <path d="M72 94h36" stroke="#f8fbff" stroke-width="10" stroke-linecap="round"/>
+  <path d="M72 94h36" stroke="#fffaf0" stroke-width="10" stroke-linecap="round"/>
 </svg>

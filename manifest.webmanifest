@@ -4,8 +4,8 @@
   "description": "Daily mood-based song recommendations from your own playlists.",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#101321",
-  "theme_color": "#101321",
+  "background_color": "#20150f",
+  "theme_color": "#20150f",
   "icons": [
     {
       "src": "assets/icon.svg",

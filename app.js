@@ -6,10 +6,108 @@ const storageKeys = {
   logo: "moodix_logo_choice",
   waitlist: "moodix_app_waitlist",
   checkMode: "moodix_check_mode",
-  weekAnalysis: "moodix_week_analysis"
+  weekAnalysis: "moodix_week_analysis",
+  spotifyToken: "moodix_spotify_token",
+  spotifyVerifier: "moodix_spotify_verifier",
+  spotifyState: "moodix_spotify_state"
 };
 
 const memoryStorage = {};
+const spotifyConfig = {
+  clientId: "",
+  scopes: ["playlist-read-private", "playlist-read-collaborative"],
+  redirectUri: "https://johnny0103.github.io/moodix/import.html"
+};
+
+const moodQuestions = [
+  {
+    name: "feeling",
+    question: "How do you feel today?",
+    options: [
+      ["light", "Light", "Open, easy, a little bright"],
+      ["steady", "Steady", "Balanced and manageable"],
+      ["heavy", "Heavy", "Low, tired, or slow"],
+      ["restless", "Restless", "Ready to move or shake something off"],
+      ["tender", "Tender", "Soft, emotional, or close to the heart"]
+    ]
+  },
+  {
+    name: "plans",
+    question: "What are you doing today?",
+    options: [
+      ["work school class project", "Work or school", "Tasks, classes, meetings, deadlines"],
+      ["errands busy drive", "Errands", "Moving between small responsibilities"],
+      ["gym workout run move", "Gym or movement", "Training, walking, dancing, moving"],
+      ["friends family social party", "Seeing people", "Friends, family, dates, groups"],
+      ["rest sleep recover quiet", "Resting", "Home, quiet, recovery, low pressure"],
+      ["study create focus progress", "Studying or creating", "Deep work, making, practicing"]
+    ]
+  },
+  {
+    name: "pace",
+    question: "What pace would help today feel better?",
+    options: [
+      ["slow", "Slow and soft", "Lower the volume of the day"],
+      ["steady", "Steady", "Keep things calm and reliable"],
+      ["bright", "Upbeat", "Lift the room a little"],
+      ["intense", "Fast and intense", "Give me energy and momentum"]
+    ]
+  },
+  {
+    name: "setting",
+    question: "Where will most of today happen?",
+    options: [
+      ["home", "Mostly at home", "Your own space"],
+      ["work", "Work or school", "A focused place"],
+      ["outside", "Outside or commuting", "Moving through the day"],
+      ["social", "Around people", "Shared rooms and conversations"]
+    ]
+  },
+  {
+    name: "company",
+    question: "Who are you mostly around?",
+    options: [
+      ["solo", "Mostly myself", "A personal headspace"],
+      ["team", "Team or classmates", "People with tasks attached"],
+      ["friends", "Friends or family", "Familiar energy"],
+      ["someone", "Someone close", "One person matters today"]
+    ]
+  },
+  {
+    name: "need",
+    question: "What should music quietly do for you?",
+    options: [
+      ["focus", "Keep me focused", "Make the next thing easier"],
+      ["lift", "Lift me up", "Bring light back into the room"],
+      ["settle", "Settle me down", "Calm the nervous edge"],
+      ["feel", "Let me feel things", "Give emotion a place to land"],
+      ["move", "Push my energy forward", "Help me start moving"]
+    ]
+  },
+  {
+    name: "success",
+    question: "What would make today feel successful?",
+    options: [
+      ["done finish one thing progress", "Finish one thing", "A clear small win"],
+      ["lighter calm better", "Feel lighter", "Less weight by tonight"],
+      ["progress project focus", "Make progress", "A few real steps forward"],
+      ["fun friends celebrate", "Have fun", "Leave room for joy"],
+      ["calm simple steady", "Stay calm", "Keep the day smooth"]
+    ]
+  },
+  {
+    name: "mind",
+    question: "What is sitting on your mind?",
+    options: [
+      ["deadline exam project work", "A deadline", "Something needs attention"],
+      ["person love miss care", "A person", "Someone is taking up space"],
+      ["change future unsure", "A change", "Something feels in motion"],
+      ["excited bright fun", "Excitement", "There is something to look forward to"],
+      ["stress tired busy", "Stress", "A bit too much at once"],
+      ["simple calm nothing", "Nothing heavy", "A clean enough headspace"]
+    ]
+  }
+];
 
 function storageGet(key) {
   try {
@@ -23,6 +121,15 @@ function storageSet(key, value) {
   memoryStorage[key] = value;
   try {
     window.localStorage?.setItem(key, value);
+  } catch {
+    // Memory fallback keeps the current prototype session usable.
+  }
+}
+
+function storageRemove(key) {
+  delete memoryStorage[key];
+  try {
+    window.localStorage?.removeItem(key);
   } catch {
     // Memory fallback keeps the current prototype session usable.
   }
@@ -119,6 +226,15 @@ function getLocalDayMeta() {
 
 function normalize(value) {
   return String(value || "").trim().toLowerCase();
+}
+
+function escapeHTML(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll("\"", "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
 function setLogo(choice) {
@@ -302,19 +418,87 @@ function getStoredAnalysis() {
 function setupDayForm() {
   const form = document.querySelector("[data-day-form]");
   const card = document.querySelector("[data-analysis-card]");
+  const questionTarget = document.querySelector("[data-wizard-question]");
+  const percent = document.querySelector("[data-wizard-percent]");
+  const left = document.querySelector("[data-wizard-left]");
+  const bar = document.querySelector("[data-wizard-bar]");
   if (!form || !card) return;
 
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const analysis = analyzeDay(new FormData(form));
+  if (!questionTarget) {
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const analysis = analyzeDay(new FormData(form));
+      storageSet(storageKeys.checkMode, "today");
+      setJSON(storageKeys.analysis, analysis);
+      document.querySelector("[data-day-word]").textContent = analysis.word;
+      document.querySelector("[data-day-summary]").textContent = `${analysis.weekday} reads as ${analysis.word.toLowerCase()}. Moodix saved this for ${analysis.date}.`;
+      document.querySelector("[data-analysis-detail]").textContent = analysis.detail;
+      card.hidden = false;
+      card.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+    return;
+  }
+
+  const answers = {};
+  let step = 0;
+
+  const saveAnalysis = () => {
+    const synthetic = new FormData();
+    moodQuestions.forEach((question) => synthetic.set(question.name, answers[question.name] || question.options[0][0]));
+    const analysis = analyzeDay(synthetic);
     storageSet(storageKeys.checkMode, "today");
     setJSON(storageKeys.analysis, analysis);
     document.querySelector("[data-day-word]").textContent = analysis.word;
     document.querySelector("[data-day-summary]").textContent = `${analysis.weekday} reads as ${analysis.word.toLowerCase()}. Moodix saved this for ${analysis.date}.`;
     document.querySelector("[data-analysis-detail]").textContent = analysis.detail;
     card.hidden = false;
+    form.hidden = true;
     card.scrollIntoView({ behavior: "smooth", block: "center" });
+  };
+
+  const updateProgress = () => {
+    const completed = Math.min(step, moodQuestions.length);
+    const completion = Math.round((completed / moodQuestions.length) * 100);
+    if (percent) percent.textContent = `${completion}% complete`;
+    if (left) {
+      const remaining = moodQuestions.length - completed;
+      left.textContent = remaining === 1 ? "1 question left" : `${remaining} questions left`;
+    }
+    if (bar) bar.style.width = `${completion}%`;
+  };
+
+  const renderStep = () => {
+    const question = moodQuestions[step];
+    if (!question) {
+      updateProgress();
+      saveAnalysis();
+      return;
+    }
+    questionTarget.innerHTML = `
+      <p class="eyebrow">Question ${step + 1} of ${moodQuestions.length}</p>
+      <h2>${question.question}</h2>
+      <div class="wizard-options">
+        ${question.options.map(([value, label, hint]) => `
+          <button class="wizard-option" type="button" data-answer="${escapeHTML(value)}">
+            <strong>${escapeHTML(label)}</strong>
+            <small>${escapeHTML(hint)}</small>
+          </button>
+        `).join("")}
+      </div>
+    `;
+    updateProgress();
+  };
+
+  questionTarget.addEventListener("click", (event) => {
+    const option = event.target.closest("[data-answer]");
+    if (!option) return;
+    answers[moodQuestions[step].name] = option.dataset.answer;
+    step += 1;
+    renderStep();
   });
+
+  form.addEventListener("submit", (event) => event.preventDefault());
+  renderStep();
 }
 
 function setupMoodMode() {
@@ -522,6 +706,206 @@ function setupImportContext() {
   if (context) context.textContent = `Moodix will rank songs for a ${analysis.word.toLowerCase()} ${analysis.weekday}.`;
 }
 
+function getSpotifyClientId() {
+  return window.MOODIX_SPOTIFY_CLIENT_ID || spotifyConfig.clientId;
+}
+
+function getSpotifyRedirectUri() {
+  if (location.hostname === "johnny0103.github.io") return spotifyConfig.redirectUri;
+  return `${location.origin}${location.pathname}`;
+}
+
+function randomString(length = 64) {
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
+  const values = new Uint8Array(length);
+  crypto.getRandomValues(values);
+  return Array.from(values, (value) => alphabet[value % alphabet.length]).join("");
+}
+
+function base64UrlEncode(bytes) {
+  return btoa(String.fromCharCode(...new Uint8Array(bytes)))
+    .replaceAll("+", "-")
+    .replaceAll("/", "_")
+    .replaceAll("=", "");
+}
+
+async function sha256(value) {
+  return crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+}
+
+async function startSpotifyAuth() {
+  const clientId = getSpotifyClientId();
+  const status = document.querySelector("[data-spotify-status]");
+  if (!clientId) {
+    if (status) {
+      status.innerHTML = "Spotify is ready, but it needs your Client ID first. Create a Spotify app, add the redirect URI below, then set <strong>window.MOODIX_SPOTIFY_CLIENT_ID</strong> or <strong>spotifyConfig.clientId</strong> in app.js.";
+    }
+    return;
+  }
+
+  const verifier = randomString();
+  const state = randomString(24);
+  storageSet(storageKeys.spotifyVerifier, verifier);
+  storageSet(storageKeys.spotifyState, state);
+
+  const params = new URLSearchParams({
+    response_type: "code",
+    client_id: clientId,
+    scope: spotifyConfig.scopes.join(" "),
+    redirect_uri: getSpotifyRedirectUri(),
+    state,
+    code_challenge_method: "S256",
+    code_challenge: base64UrlEncode(await sha256(verifier))
+  });
+  location.href = `https://accounts.spotify.com/authorize?${params.toString()}`;
+}
+
+async function exchangeSpotifyCode(code) {
+  const clientId = getSpotifyClientId();
+  const verifier = storageGet(storageKeys.spotifyVerifier);
+  if (!clientId || !verifier) throw new Error("Missing Spotify client configuration.");
+
+  const body = new URLSearchParams({
+    client_id: clientId,
+    grant_type: "authorization_code",
+    code,
+    redirect_uri: getSpotifyRedirectUri(),
+    code_verifier: verifier
+  });
+
+  const response = await fetch("https://accounts.spotify.com/api/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body
+  });
+  if (!response.ok) throw new Error("Spotify authorization failed.");
+  const token = await response.json();
+  setJSON(storageKeys.spotifyToken, {
+    accessToken: token.access_token,
+    expiresAt: Date.now() + (token.expires_in || 3600) * 1000,
+    scope: token.scope || ""
+  });
+  storageRemove(storageKeys.spotifyVerifier);
+  storageRemove(storageKeys.spotifyState);
+  return token.access_token;
+}
+
+function getSpotifyAccessToken() {
+  const token = getJSON(storageKeys.spotifyToken);
+  if (!token?.accessToken || Date.now() > token.expiresAt) return null;
+  return token.accessToken;
+}
+
+async function spotifyFetch(path) {
+  const token = getSpotifyAccessToken();
+  if (!token) throw new Error("Connect Spotify again to refresh access.");
+  const response = await fetch(`https://api.spotify.com/v1${path}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!response.ok) throw new Error("Spotify request failed.");
+  return response.json();
+}
+
+function spotifyTrackToSong(item) {
+  const track = item.track || item;
+  return {
+    title: track.name || "Untitled track",
+    artist: track.artists?.map((artist) => artist.name).join(", ") || "Unknown artist",
+    mood: "",
+    energy: "",
+    genre: "",
+    activity: ""
+  };
+}
+
+async function loadSpotifyPlaylist(playlistId) {
+  const note = document.querySelector("[data-import-note]");
+  const link = document.querySelector("[data-result-link]");
+  const data = await spotifyFetch(`/playlists/${encodeURIComponent(playlistId)}/tracks?limit=100`);
+  const tracks = (data.items || []).map(spotifyTrackToSong).filter((song) => song.title && song.artist);
+  const normalized = tracks.map((song) => ({
+    ...song,
+    mood: inferMood(song),
+    energy: inferEnergy(song)
+  }));
+  setJSON(storageKeys.tracks, normalized.length ? normalized : demoSongs);
+  storageSet(storageKeys.source, "Spotify");
+  if (note) note.innerHTML = `Imported <strong>${normalized.length || demoSongs.length}</strong> tracks from <strong>Spotify</strong>.`;
+  link?.removeAttribute("hidden");
+}
+
+function renderSpotifyPlaylists(playlists) {
+  const target = document.querySelector("[data-spotify-playlists]");
+  if (!target) return;
+  target.innerHTML = `
+    <strong>Choose a Spotify playlist</strong>
+    <div class="spotify-playlist-list">
+      ${playlists.map((playlist) => `
+        <button type="button" data-spotify-playlist="${escapeHTML(playlist.id)}">
+          <span>${escapeHTML(playlist.name)}</span>
+          <small>${playlist.tracks?.total || 0} tracks</small>
+        </button>
+      `).join("")}
+    </div>
+  `;
+  target.hidden = false;
+}
+
+async function loadSpotifyPlaylists() {
+  const status = document.querySelector("[data-spotify-status]");
+  const data = await spotifyFetch("/me/playlists?limit=20");
+  renderSpotifyPlaylists(data.items || []);
+  if (status) status.textContent = "Spotify connected. Choose a playlist below to import tracks.";
+}
+
+async function setupSpotifyImport() {
+  const connect = document.querySelector("[data-spotify-connect]");
+  const status = document.querySelector("[data-spotify-status]");
+  const playlistTarget = document.querySelector("[data-spotify-playlists]");
+  if (!connect && !status && !playlistTarget) return;
+
+  if (!getSpotifyClientId() && status) {
+    status.innerHTML = "Spotify direct import needs a Client ID. Add your Spotify app Client ID in <strong>app.js</strong>, then this button will start PKCE authorization.";
+  }
+
+  connect?.addEventListener("click", startSpotifyAuth);
+  playlistTarget?.addEventListener("click", async (event) => {
+    const button = event.target.closest("[data-spotify-playlist]");
+    if (!button) return;
+    button.disabled = true;
+    button.textContent = "Importing...";
+    try {
+      await loadSpotifyPlaylist(button.dataset.spotifyPlaylist);
+    } catch (error) {
+      if (status) status.textContent = error.message;
+    }
+  });
+
+  const params = new URLSearchParams(location.search);
+  const code = params.get("code");
+  const state = params.get("state");
+  if (code) {
+    try {
+      if (state !== storageGet(storageKeys.spotifyState)) throw new Error("Spotify state check failed. Try connecting again.");
+      if (status) status.textContent = "Finishing Spotify connection...";
+      await exchangeSpotifyCode(code);
+      history.replaceState({}, "", location.pathname);
+      await loadSpotifyPlaylists();
+    } catch (error) {
+      if (status) status.textContent = error.message;
+    }
+    return;
+  }
+
+  if (getSpotifyAccessToken()) {
+    try {
+      await loadSpotifyPlaylists();
+    } catch (error) {
+      if (status) status.textContent = error.message;
+    }
+  }
+}
+
 function setupSourceChips() {
   const chips = document.querySelectorAll("[data-source]");
   const label = document.querySelector("[data-selected-source]");
@@ -531,7 +915,9 @@ function setupSourceChips() {
       chips.forEach((item) => item.classList.toggle("active", item === chip));
       if (label) label.textContent = chip.dataset.source;
       storageSet(storageKeys.source, chip.dataset.source);
-      if (note) note.textContent = `${chip.dataset.source} selected. Authorization is simulated in this static prototype; save playlist rows to continue.`;
+      if (note) note.textContent = chip.dataset.source === "Spotify"
+        ? "Spotify selected. Use the direct import card once your Client ID is configured, or save playlist rows manually."
+        : `${chip.dataset.source} selected. This provider is guidance-only in this static prototype; save playlist rows to continue.`;
     });
   });
 }
@@ -669,6 +1055,7 @@ setupDayForm();
 setupMoodMode();
 setupWeekForm();
 setupImportContext();
+setupSpotifyImport();
 setupSourceChips();
 setupIntentButtons();
 setupSignup();
