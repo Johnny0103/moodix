@@ -11,7 +11,7 @@
     <link rel="apple-touch-icon" href="assets/apple-touch-icon.svg">
     <link rel="stylesheet" href="styles.css">
   </head>
-  <body class="signup-page">
+  <body class="signup-page" data-requires-signin>
     <header class="site-header">
       <a class="brand" href="index.html" aria-label="Moodix home">
         <span class="brand-mark" data-brand-mark aria-hidden="true"></span>
@@ -19,7 +19,8 @@
       </a>
       <nav class="nav-links" aria-label="Primary navigation">
         <a href="mood-check.html">Mood check</a>
-        <a href="import.html">Upload music</a>
+        <a href="import.html">Import</a>
+        <a href="result.html">Result</a>
         <a href="app-version.html">App version</a>
       </nav>
       <a class="header-cta" href="mood-check.html">Start again</a>
@@ -40,8 +41,8 @@
           </div>
           <div class="flow-progress dark-progress" aria-label="Moodix flow progress">
             <span>Mood</span>
-            <span>Music</span>
-            <span>Top 5</span>
+            <span>Import</span>
+            <span>Result</span>
             <span class="active">App</span>
           </div>
         </div>
@@ -69,6 +70,6 @@
       </section>
     </main>
 
-    <script src="app.js?v=3" defer></script>
+    <script src="app.js?v=4" defer></script>
   </body>
 </html>

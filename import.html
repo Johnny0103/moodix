@@ -4,14 +4,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#101321">
-    <meta name="description" content="Upload or paste music into Moodix and get a top-five song match for your day.">
-    <title>Moodix | Upload music</title>
+    <meta name="description" content="Connect or upload music into Moodix for today's top-five result.">
+    <title>Moodix | Step 2 import music</title>
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="assets/apple-touch-icon.svg">
     <link rel="stylesheet" href="styles.css">
   </head>
-  <body>
+  <body data-requires-signin>
     <header class="site-header">
       <a class="brand" href="index.html" aria-label="Moodix home">
         <span class="brand-mark" data-brand-mark aria-hidden="true"></span>
@@ -19,39 +19,45 @@
       </a>
       <nav class="nav-links" aria-label="Primary navigation">
         <a href="mood-check.html">Mood check</a>
-        <a href="import.html">Upload music</a>
+        <a href="import.html">Import</a>
+        <a href="result.html">Result</a>
         <a href="app-version.html">App version</a>
       </nav>
-      <a class="header-cta" href="app-version.html">App version</a>
+      <a class="header-cta" href="result.html">Next: result</a>
     </header>
 
     <main>
       <section class="flow-hero compact-flow" aria-labelledby="import-title">
         <div>
-          <p class="eyebrow">Step 2 / Upload music</p>
-          <h1 id="import-title">Choose where your songs come from.</h1>
+          <p class="eyebrow">Step 2 / Import</p>
+          <h1 id="import-title">Connect your music source.</h1>
           <p class="hero-copy" data-import-context>Your Moodix word will shape the ranking.</p>
         </div>
         <aside class="today-card">
-          <span>Your day</span>
+          <span>Today</span>
           <strong data-import-word>Unscored</strong>
-          <small data-import-day>Run the mood check first for a sharper match.</small>
+          <small data-import-day>Complete Step 1 for the strongest match.</small>
         </aside>
       </section>
 
       <section class="section upload-page-section">
         <div class="flow-progress" aria-label="Moodix flow progress">
-          <span> Mood</span>
-          <span class="active">Music</span>
-          <span>Top 5</span>
+          <span>Mood</span>
+          <span class="active">Import</span>
+          <span>Result</span>
           <span>App</span>
         </div>
+
+        <div class="section-heading compact">
+          <p class="eyebrow">Music authorization</p>
+          <h2>Choose a provider or upload manually.</h2>
+          <p>Provider cards simulate authorization for this GitHub Pages prototype. CSV and pasted tracks power the working result.</p>
+        </div>
+
         <div class="source-picker" aria-label="Prototype music source options">
-          <button class="source-card active" type="button" data-source="Spotify"><span>Spotify</span><small>CSV export or copied tracks</small></button>
-          <button class="source-card" type="button" data-source="Apple Music"><span>Apple Music</span><small>Library export or pasted list</small></button>
-          <button class="source-card" type="button" data-source="YouTube Music"><span>YouTube Music</span><small>Playlist text or export</small></button>
-          <button class="source-card" type="button" data-source="SoundCloud"><span>SoundCloud</span><small>Liked tracks or playlist rows</small></button>
-          <button class="source-card" type="button" data-source="Other"><span>Other</span><small>Any title and artist list</small></button>
+          <button class="source-card active" type="button" data-source="Spotify"><span>Spotify</span><small>OAuth-ready PKCE hook</small></button>
+          <button class="source-card" type="button" data-source="Apple Music"><span>Apple Music</span><small>MusicKit authorization hook</small></button>
+          <button class="source-card" type="button" data-source="YouTube Music"><span>YouTube Music</span><small>YouTube OAuth hook</small></button>
         </div>
 
         <div class="upload-layout">
@@ -59,27 +65,26 @@
             <label for="playlist-file">CSV file</label>
             <input id="playlist-file" type="file" accept=".csv,text/csv,text/plain" data-playlist-file>
             <label for="playlist-paste">Paste tracks</label>
-            <textarea id="playlist-paste" data-playlist-text rows="10" spellcheck="false">Blinding Lights, The Weeknd, energetic, high, synthpop, commute
-Sunflower, Post Malone and Swae Lee, happy, medium, pop, morning
-Weightless, Marconi Union, calm, low, ambient, sleep
+            <textarea id="playlist-paste" data-playlist-text rows="10" spellcheck="false">Blinding Lights, The Weeknd, electric, high, synthpop, commute
+Sunflower, Post Malone and Swae Lee, bright, medium, pop, morning
+Weightless, Marconi Union, restorative, low, ambient, rest
 Good Days, SZA, reflective, medium, r&b, unwind
-Levitating, Dua Lipa, happy, high, dance, workout
+Levitating, Dua Lipa, bright, high, dance, workout
 Intro, The xx, focused, medium, indie electronic, work</textarea>
-            <button class="button primary" type="button" data-generate-results>Find my top 5</button>
-            <p class="helper-text" data-import-note>Prototype source: <strong data-selected-source>Spotify</strong>. Real account connection is not enabled yet.</p>
+            <button class="button primary" type="button" data-save-import>Save music import</button>
+            <p class="helper-text" data-import-note>Prototype source: <strong data-selected-source>Spotify</strong>. Real provider tokens are not stored.</p>
           </div>
 
-          <section class="single-results" aria-labelledby="results-title">
-            <p class="eyebrow">Moodix result</p>
-            <h2 id="results-title">Your top five will appear here.</h2>
-            <p class="result-intro">Moodix ranks one daily set from the word it inferred on the previous page.</p>
-            <div class="results-grid single" data-results-grid></div>
-            <a class="button secondary dark" href="app-version.html" data-app-version-link hidden>Next: app version</a>
+          <section class="auth-panel" aria-labelledby="auth-title">
+            <p class="eyebrow">Connection status</p>
+            <h2 id="auth-title">Ready for static prototype matching.</h2>
+            <p data-auth-note>Choose a source, then save your playlist rows. Moodix will use them on the result page.</p>
+            <a class="button secondary dark" href="result.html" data-result-link hidden>Continue to result</a>
           </section>
         </div>
       </section>
     </main>
 
-    <script src="app.js?v=3" defer></script>
+    <script src="app.js?v=4" defer></script>
   </body>
 </html>

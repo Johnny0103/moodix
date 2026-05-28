@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#101321">
+    <meta name="description" content="Reveal today's Moodix emotional word and top five songs.">
+    <title>Moodix | Step 3 result</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.svg">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body data-requires-signin>
+    <header class="site-header">
+      <a class="brand" href="index.html" aria-label="Moodix home">
+        <span class="brand-mark" data-brand-mark aria-hidden="true"></span>
+        <span>Moodix</span>
+      </a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="mood-check.html">Mood check</a>
+        <a href="import.html">Import</a>
+        <a href="result.html">Result</a>
+        <a href="app-version.html">App version</a>
+      </nav>
+      <a class="header-cta" href="app-version.html">App version</a>
+    </header>
+
+    <main>
+      <section class="flow-hero compact-flow" aria-labelledby="result-title">
+        <div>
+          <p class="eyebrow">Step 3 / Result</p>
+          <h1 id="result-title">Today's emotional word.</h1>
+          <p class="hero-copy">Moodix summarizes the check-in first. Then you can reveal the five songs for today.</p>
+        </div>
+        <aside class="today-card">
+          <span data-local-weekday>Today</span>
+          <strong data-local-date>Loading local date</strong>
+          <small data-local-time>Local time</small>
+        </aside>
+      </section>
+
+      <section class="section result-page-section">
+        <div class="flow-progress" aria-label="Moodix flow progress">
+          <span>Mood</span>
+          <span>Import</span>
+          <span class="active">Result</span>
+          <span>App</span>
+        </div>
+
+        <article class="word-result-card">
+          <p class="eyebrow">Emotional analyzing AI</p>
+          <h2 data-result-word>Reflective</h2>
+          <p data-result-summary>Complete the mood check to generate a sharper word for today.</p>
+          <button class="button primary" type="button" data-reveal-songs>Next: show today's top five</button>
+        </article>
+
+        <div class="results-grid single" data-results-grid hidden></div>
+        <a class="button secondary dark" href="app-version.html" data-after-results hidden>Would you join the app version?</a>
+      </section>
+    </main>
+
+    <script src="app.js?v=4" defer></script>
+  </body>
+</html>

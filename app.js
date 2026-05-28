@@ -1,3 +1,31 @@
+const storageKeys = {
+  user: "moodix_user",
+  analysis: "moodix_day_analysis",
+  source: "moodix_music_source",
+  tracks: "moodix_playlist_tracks",
+  logo: "moodix_logo_choice",
+  waitlist: "moodix_app_waitlist"
+};
+
+const memoryStorage = {};
+
+function storageGet(key) {
+  try {
+    return window.localStorage?.getItem(key) ?? memoryStorage[key] ?? null;
+  } catch {
+    return memoryStorage[key] ?? null;
+  }
+}
+
+function storageSet(key, value) {
+  memoryStorage[key] = value;
+  try {
+    window.localStorage?.setItem(key, value);
+  } catch {
+    // Memory fallback keeps the current prototype session usable.
+  }
+}
+
 const logoMarks = {
   pulse: `
     <svg viewBox="0 0 44 44" aria-hidden="true">
@@ -58,6 +86,35 @@ const moodHints = {
   reflective: ["midnight", "memory", "days", "dream", "nights", "past", "think", "good days"]
 };
 
+function getJSON(key, fallback = null) {
+  try {
+    return JSON.parse(storageGet(key) || "null") ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function setJSON(key, value) {
+  storageSet(key, JSON.stringify(value));
+}
+
+function localDayStamp(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function getLocalDayMeta() {
+  const now = new Date();
+  return {
+    stamp: localDayStamp(now),
+    weekday: now.toLocaleDateString(undefined, { weekday: "long" }),
+    date: now.toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" }),
+    time: now.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })
+  };
+}
+
 function normalize(value) {
   return String(value || "").trim().toLowerCase();
 }
@@ -76,31 +133,70 @@ function setLogo(choice) {
 }
 
 function setupLogoPicker() {
-  const saved = localStorage.getItem("moodix_logo_choice") || "pulse";
+  const saved = storageGet(storageKeys.logo) || "pulse";
   setLogo(saved);
   document.querySelectorAll("[data-logo-choice]").forEach((button) => {
     button.addEventListener("click", () => {
-      localStorage.setItem("moodix_logo_choice", button.dataset.logoChoice);
+      storageSet(storageKeys.logo, button.dataset.logoChoice);
       setLogo(button.dataset.logoChoice);
     });
   });
 }
 
 function setupLocalTime() {
-  const now = new Date();
-  const weekday = now.toLocaleDateString(undefined, { weekday: "long" });
-  const date = now.toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
-  const time = now.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+  const meta = getLocalDayMeta();
+  document.querySelectorAll("[data-local-weekday]").forEach((item) => item.textContent = meta.weekday);
+  document.querySelectorAll("[data-local-date]").forEach((item) => item.textContent = meta.date);
+  document.querySelectorAll("[data-local-time]").forEach((item) => item.textContent = `${meta.time} local time`);
+}
 
-  document.querySelectorAll("[data-local-weekday]").forEach((item) => {
-    item.textContent = weekday;
+function getUser() {
+  return getJSON(storageKeys.user);
+}
+
+function setupSignin() {
+  const form = document.querySelector("[data-signin-form]");
+  const note = document.querySelector("[data-signin-note]");
+  const user = getUser();
+
+  if (user) {
+    document.body.classList.add("is-signed-in");
+    document.querySelector("[data-signed-in-note]")?.replaceChildren(`Signed in as ${user.name || user.email}. Choose a step below.`);
+    document.querySelectorAll("[data-step-link]").forEach((link) => link.classList.remove("locked"));
+    if (note) note.textContent = "You are signed in for this prototype.";
+  }
+
+  form?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const formData = new FormData(form);
+    const userData = {
+      name: formData.get("name"),
+      email: formData.get("email"),
+      signedInAt: new Date().toISOString()
+    };
+    setJSON(storageKeys.user, userData);
+    document.body.classList.add("is-signed-in");
+    document.querySelectorAll("[data-step-link]").forEach((link) => link.classList.remove("locked"));
+    document.querySelector("[data-signed-in-note]")?.replaceChildren(`Signed in as ${userData.name || userData.email}. Choose a step below.`);
+    note.textContent = "Signed in. Start with Mood check.";
   });
-  document.querySelectorAll("[data-local-date]").forEach((item) => {
-    item.textContent = date;
-  });
-  document.querySelectorAll("[data-local-time]").forEach((item) => {
-    item.textContent = `${time} local time`;
-  });
+}
+
+function requireSignin() {
+  if (!document.body.matches("[data-requires-signin]")) return;
+  if (getUser()) return;
+
+  const gate = document.createElement("section");
+  gate.className = "signin-gate";
+  gate.innerHTML = `
+    <div>
+      <p class="eyebrow">Sign in required</p>
+      <h1>Start from the Moodix sign-in page.</h1>
+      <p>Moodix saves today's local check-in after prototype sign-in.</p>
+      <a class="button primary" href="index.html#signin">Go to sign in</a>
+    </div>
+  `;
+  document.querySelector("main")?.replaceChildren(gate);
 }
 
 function addScore(scores, word, amount) {
@@ -108,12 +204,8 @@ function addScore(scores, word, amount) {
 }
 
 function analyzeDay(formData) {
+  const meta = getLocalDayMeta();
   const text = normalize(`${formData.get("plans")} ${formData.get("mind")} ${formData.get("success")}`);
-  const pace = formData.get("pace");
-  const setting = formData.get("setting");
-  const company = formData.get("company");
-  const need = formData.get("need");
-  const texture = formData.get("texture");
   const scores = {
     Focused: 0,
     Restorative: 0,
@@ -124,31 +216,35 @@ function analyzeDay(formData) {
     Reflective: 0
   };
 
-  if (pace === "slow") addScore(scores, "Restorative", 4);
-  if (pace === "steady") addScore(scores, "Grounded", 3);
-  if (pace === "bright") addScore(scores, "Bright", 4);
-  if (pace === "intense") addScore(scores, "Electric", 4);
+  const feelingMap = {
+    light: "Bright",
+    steady: "Grounded",
+    heavy: "Restorative",
+    restless: "Electric",
+    tender: "Tender"
+  };
+  addScore(scores, feelingMap[formData.get("feeling")] || "Reflective", 5);
 
-  if (setting === "work") addScore(scores, "Focused", 4);
-  if (setting === "home") addScore(scores, "Grounded", 3);
-  if (setting === "outside") addScore(scores, "Electric", 2);
-  if (setting === "social") addScore(scores, "Bright", 3);
+  if (formData.get("pace") === "slow") addScore(scores, "Restorative", 4);
+  if (formData.get("pace") === "steady") addScore(scores, "Grounded", 3);
+  if (formData.get("pace") === "bright") addScore(scores, "Bright", 4);
+  if (formData.get("pace") === "intense") addScore(scores, "Electric", 4);
 
-  if (company === "solo") addScore(scores, "Reflective", 2);
-  if (company === "team") addScore(scores, "Focused", 2);
-  if (company === "friends") addScore(scores, "Bright", 2);
-  if (company === "someone") addScore(scores, "Tender", 4);
+  if (formData.get("setting") === "work") addScore(scores, "Focused", 4);
+  if (formData.get("setting") === "home") addScore(scores, "Grounded", 3);
+  if (formData.get("setting") === "outside") addScore(scores, "Electric", 2);
+  if (formData.get("setting") === "social") addScore(scores, "Bright", 3);
 
-  if (need === "focus") addScore(scores, "Focused", 5);
-  if (need === "lift") addScore(scores, "Bright", 5);
-  if (need === "settle") addScore(scores, "Restorative", 5);
-  if (need === "feel") addScore(scores, "Tender", 3), addScore(scores, "Reflective", 3);
-  if (need === "move") addScore(scores, "Electric", 5);
+  if (formData.get("company") === "solo") addScore(scores, "Reflective", 2);
+  if (formData.get("company") === "team") addScore(scores, "Focused", 2);
+  if (formData.get("company") === "friends") addScore(scores, "Bright", 2);
+  if (formData.get("company") === "someone") addScore(scores, "Tender", 4);
 
-  if (texture === "clean") addScore(scores, "Focused", 4);
-  if (texture === "warm") addScore(scores, "Tender", 3), addScore(scores, "Grounded", 2);
-  if (texture === "open") addScore(scores, "Electric", 3), addScore(scores, "Bright", 2);
-  if (texture === "soft") addScore(scores, "Restorative", 4);
+  if (formData.get("need") === "focus") addScore(scores, "Focused", 5);
+  if (formData.get("need") === "lift") addScore(scores, "Bright", 5);
+  if (formData.get("need") === "settle") addScore(scores, "Restorative", 5);
+  if (formData.get("need") === "feel") addScore(scores, "Tender", 3), addScore(scores, "Reflective", 3);
+  if (formData.get("need") === "move") addScore(scores, "Electric", 5);
 
   const keywordMap = {
     Focused: ["deadline", "exam", "study", "class", "work", "project", "focus", "done", "progress"],
@@ -159,7 +255,6 @@ function analyzeDay(formData) {
     Grounded: ["home", "clean", "cook", "routine", "steady", "simple", "calm"],
     Reflective: ["thinking", "remember", "unsure", "change", "past", "future", "alone"]
   };
-
   Object.entries(keywordMap).forEach(([word, keywords]) => {
     keywords.forEach((keyword) => {
       if (text.includes(keyword)) addScore(scores, word, 2);
@@ -167,34 +262,25 @@ function analyzeDay(formData) {
   });
 
   const word = Object.entries(scores).sort((a, b) => b[1] - a[1])[0][0];
-  const now = new Date();
-
   return {
     word,
     detail: analysisDetail(word, formData),
-    weekday: now.toLocaleDateString(undefined, { weekday: "long" }),
-    date: now.toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" }),
-    time: now.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" }),
+    ...meta,
     answers: Object.fromEntries(formData.entries()),
     profile: wordProfiles[word]
   };
 }
 
 function analysisDetail(word, formData) {
-  const needLabels = {
-    focus: "focus",
-    lift: "lift",
-    settle: "calm",
-    feel: "emotional space",
-    move: "momentum"
-  };
-  const settingLabels = {
-    home: "home",
-    work: "work or school",
-    outside: "movement",
-    social: "people"
-  };
+  const needLabels = { focus: "focus", lift: "lift", settle: "calm", feel: "emotional space", move: "momentum" };
+  const settingLabels = { home: "home", work: "work or school", outside: "movement", social: "people" };
   return `Because you pointed toward ${settingLabels[formData.get("setting")] || "today"} and asked music for ${needLabels[formData.get("need")] || "support"}, Moodix reads the day as ${word.toLowerCase()}.`;
+}
+
+function getStoredAnalysis() {
+  const analysis = getJSON(storageKeys.analysis);
+  if (!analysis || analysis.stamp !== getLocalDayMeta().stamp) return null;
+  return analysis;
 }
 
 function setupDayForm() {
@@ -205,10 +291,9 @@ function setupDayForm() {
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     const analysis = analyzeDay(new FormData(form));
-    localStorage.setItem("moodix_day_analysis", JSON.stringify(analysis));
-
+    setJSON(storageKeys.analysis, analysis);
     document.querySelector("[data-day-word]").textContent = analysis.word;
-    document.querySelector("[data-day-summary]").textContent = `${analysis.weekday} reads as ${analysis.word.toLowerCase()}. Moodix will use that word to shape your top five songs.`;
+    document.querySelector("[data-day-summary]").textContent = `${analysis.weekday} reads as ${analysis.word.toLowerCase()}. Moodix saved this for ${analysis.date}.`;
     document.querySelector("[data-analysis-detail]").textContent = analysis.detail;
     card.hidden = false;
     card.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -219,18 +304,11 @@ function splitCsvLine(line) {
   const cells = [];
   let cell = "";
   let quoted = false;
-
   for (const char of line) {
-    if (char === "\"") {
-      quoted = !quoted;
-    } else if (char === "," && !quoted) {
-      cells.push(cell.trim());
-      cell = "";
-    } else {
-      cell += char;
-    }
+    if (char === "\"") quoted = !quoted;
+    else if (char === "," && !quoted) cells.push(cell.trim()), cell = "";
+    else cell += char;
   }
-
   cells.push(cell.trim());
   return cells;
 }
@@ -264,7 +342,6 @@ function parsePlaylist(text) {
     cells.forEach((cell, index) => {
       song[headers[index] || `field${index}`] = cell;
     });
-
     const normalizedSong = {
       title: song.title || song.track || song.song || cells[0] || "Untitled track",
       artist: song.artist || song.artists || song.creator || cells[1] || "Unknown artist",
@@ -273,79 +350,10 @@ function parsePlaylist(text) {
       genre: normalize(song.genre),
       activity: normalize(song.activity)
     };
-
     normalizedSong.mood = normalizedSong.mood || inferMood(normalizedSong);
     normalizedSong.energy = ["low", "medium", "high"].includes(normalizedSong.energy) ? normalizedSong.energy : inferEnergy(normalizedSong);
     return normalizedSong;
   }).filter((song) => song.title && song.artist);
-}
-
-function getStoredAnalysis() {
-  try {
-    return JSON.parse(localStorage.getItem("moodix_day_analysis") || "null");
-  } catch {
-    return null;
-  }
-}
-
-function setupImportContext() {
-  const analysis = getStoredAnalysis();
-  const word = document.querySelector("[data-import-word]");
-  const day = document.querySelector("[data-import-day]");
-  const context = document.querySelector("[data-import-context]");
-
-  if (!analysis) return;
-  if (word) word.textContent = analysis.word;
-  if (day) day.textContent = `${analysis.weekday}, ${analysis.time} local time`;
-  if (context) context.textContent = `Moodix will rank songs for a ${analysis.word.toLowerCase()} ${analysis.weekday}.`;
-}
-
-function scoreSong(song, analysis) {
-  const profile = analysis?.profile || wordProfiles.Reflective;
-  let score = 48;
-
-  if (profile.moods.includes(song.mood)) score += 28;
-  if (song.energy === profile.energy) score += 18;
-  if (profile.activities.some((activity) => song.activity.includes(activity))) score += 12;
-  if (normalize(song.genre).includes("ambient") && analysis?.word === "Restorative") score += 8;
-  if (normalize(song.genre).includes("dance") && ["Bright", "Electric"].includes(analysis?.word)) score += 8;
-  if (normalize(song.genre).includes("electronic") && analysis?.word === "Focused") score += 5;
-
-  return Math.min(99, score);
-}
-
-function reasonFor(song, analysis, fallback) {
-  const word = analysis?.word || "Reflective";
-  const profile = analysis?.profile || wordProfiles.Reflective;
-  if (profile.moods.includes(song.mood) && song.energy === profile.energy) {
-    return `Fits a ${word.toLowerCase()} day with ${song.energy} energy.`;
-  }
-  if (profile.moods.includes(song.mood)) {
-    return `Matches the emotional color Moodix inferred for today.`;
-  }
-  if (profile.activities.some((activity) => song.activity.includes(activity))) {
-    return `Works for the kind of day you described.`;
-  }
-  return fallback ? "Discovery pick added to complete the top five." : "Closest useful match from your playlist.";
-}
-
-function rankSongs(songs, analysis) {
-  const available = songs.length ? songs : demoSongs;
-  const ranked = available
-    .map((song) => ({ ...song, score: scoreSong(song, analysis), fallback: !songs.length }))
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 5);
-
-  let index = 0;
-  while (ranked.length < 5) {
-    const song = demoSongs[index % demoSongs.length];
-    if (!ranked.some((item) => item.title === song.title && item.artist === song.artist)) {
-      ranked.push({ ...song, score: scoreSong(song, analysis), fallback: true });
-    }
-    index += 1;
-  }
-
-  return ranked;
 }
 
 async function getPlaylistText() {
@@ -355,16 +363,78 @@ async function getPlaylistText() {
   return pasteInput?.value || "";
 }
 
+function setupImportContext() {
+  const analysis = getStoredAnalysis();
+  const word = document.querySelector("[data-import-word]");
+  const day = document.querySelector("[data-import-day]");
+  const context = document.querySelector("[data-import-context]");
+  if (!analysis) return;
+  if (word) word.textContent = analysis.word;
+  if (day) day.textContent = `${analysis.weekday}, ${analysis.time} local time`;
+  if (context) context.textContent = `Moodix will rank songs for a ${analysis.word.toLowerCase()} ${analysis.weekday}.`;
+}
+
+function setupSourceChips() {
+  const chips = document.querySelectorAll("[data-source]");
+  const label = document.querySelector("[data-selected-source]");
+  const note = document.querySelector("[data-auth-note]");
+  chips.forEach((chip) => {
+    chip.addEventListener("click", () => {
+      chips.forEach((item) => item.classList.toggle("active", item === chip));
+      if (label) label.textContent = chip.dataset.source;
+      storageSet(storageKeys.source, chip.dataset.source);
+      if (note) note.textContent = `${chip.dataset.source} selected. Authorization is simulated in this static prototype; save playlist rows to continue.`;
+    });
+  });
+}
+
+async function saveImport() {
+  const note = document.querySelector("[data-import-note]");
+  const link = document.querySelector("[data-result-link]");
+  const tracks = parsePlaylist(await getPlaylistText());
+  const selected = storageGet(storageKeys.source) || "Spotify";
+  setJSON(storageKeys.tracks, tracks.length ? tracks : demoSongs);
+  if (note) note.innerHTML = `Saved <strong>${tracks.length || demoSongs.length}</strong> tracks from <strong>${selected}</strong> for today's result.`;
+  link?.removeAttribute("hidden");
+}
+
+function scoreSong(song, analysis) {
+  const profile = analysis?.profile || wordProfiles.Reflective;
+  let score = 48;
+  if (profile.moods.includes(song.mood)) score += 28;
+  if (song.energy === profile.energy) score += 18;
+  if (profile.activities.some((activity) => song.activity.includes(activity))) score += 12;
+  if (normalize(song.genre).includes("ambient") && analysis?.word === "Restorative") score += 8;
+  if (normalize(song.genre).includes("dance") && ["Bright", "Electric"].includes(analysis?.word)) score += 8;
+  if (normalize(song.genre).includes("electronic") && analysis?.word === "Focused") score += 5;
+  return Math.min(99, score);
+}
+
+function reasonFor(song, analysis, fallback) {
+  const word = analysis?.word || "Reflective";
+  const profile = analysis?.profile || wordProfiles.Reflective;
+  if (profile.moods.includes(song.mood) && song.energy === profile.energy) return `Fits a ${word.toLowerCase()} day with ${song.energy} energy.`;
+  if (profile.moods.includes(song.mood)) return "Matches the emotional color Moodix inferred for today.";
+  if (profile.activities.some((activity) => song.activity.includes(activity))) return "Works for the kind of day you described.";
+  return fallback ? "Discovery pick added to complete the top five." : "Closest useful match from your playlist.";
+}
+
+function rankSongs(songs, analysis) {
+  return (songs.length ? songs : demoSongs)
+    .map((song) => ({ ...song, score: scoreSong(song, analysis), fallback: !songs.length }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 5);
+}
+
 function renderTopFive(songs, analysis) {
   const grid = document.querySelector("[data-results-grid]");
   if (!grid) return;
-
   grid.innerHTML = `
     <article class="result-card feature-result">
       <div class="result-card-top">
         <div>
-          <span>${analysis?.word || "Reflective"} / top 5</span>
-          <h3>${analysis?.weekday || "Today"}</h3>
+          <span>${analysis?.word || "Reflective"} / today</span>
+          <h3>Top five songs</h3>
         </div>
         <strong>${analysis?.profile?.energy || "medium"}</strong>
       </div>
@@ -382,40 +452,28 @@ function renderTopFive(songs, analysis) {
       </ol>
     </article>
   `;
-
-  document.querySelector("[data-app-version-link]")?.removeAttribute("hidden");
+  grid.hidden = false;
+  document.querySelector("[data-after-results]")?.removeAttribute("hidden");
 }
 
-async function generateResults() {
-  const note = document.querySelector("[data-import-note]");
-  const text = await getPlaylistText();
-  const songs = parsePlaylist(text);
+function setupResultPage() {
+  const word = document.querySelector("[data-result-word]");
+  const summary = document.querySelector("[data-result-summary]");
+  const reveal = document.querySelector("[data-reveal-songs]");
+  if (!word || !summary || !reveal) return;
+
   const analysis = getStoredAnalysis() || {
     word: "Reflective",
-    weekday: "Today",
+    detail: "Moodix needs today's mood check for a sharper result.",
+    weekday: getLocalDayMeta().weekday,
     profile: wordProfiles.Reflective
   };
-  const ranked = rankSongs(songs, analysis);
-
-  localStorage.setItem("moodix_last_playlist_count", String(songs.length));
-  renderTopFive(ranked, analysis);
-
-  if (note) {
-    note.innerHTML = songs.length
-      ? `Imported <strong>${songs.length}</strong> tracks and ranked them for a <strong>${analysis.word}</strong> day.`
-      : "No usable tracks found, so Moodix used demo songs to show the experience.";
-  }
-}
-
-function setupSourceChips() {
-  const chips = document.querySelectorAll("[data-source]");
-  const label = document.querySelector("[data-selected-source]");
-  chips.forEach((chip) => {
-    chip.addEventListener("click", () => {
-      chips.forEach((item) => item.classList.toggle("active", item === chip));
-      if (label) label.textContent = chip.dataset.source;
-      localStorage.setItem("moodix_music_source", chip.dataset.source);
-    });
+  const tracks = getJSON(storageKeys.tracks, demoSongs);
+  word.textContent = analysis.word;
+  summary.textContent = analysis.detail || `${analysis.weekday} reads as ${analysis.word.toLowerCase()}.`;
+  reveal.addEventListener("click", () => {
+    renderTopFive(rankSongs(tracks, analysis), analysis);
+    reveal.hidden = true;
   });
 }
 
@@ -436,26 +494,20 @@ function setupSignup() {
   form?.addEventListener("submit", (event) => {
     event.preventDefault();
     const formData = new FormData(form);
-    const email = formData.get("email");
-
-    if (!email) {
+    if (!formData.get("email")) {
       note.textContent = "Add an email address so Moodix can invite you.";
       return;
     }
-
-    const signup = {
+    const signups = getJSON(storageKeys.waitlist, []);
+    signups.push({
       name: formData.get("name") || "",
-      email,
+      email: formData.get("email"),
       source: formData.get("source") || "Spotify",
       intent: formData.get("intent") || "yes",
       dayWord: getStoredAnalysis()?.word || "",
       createdAt: new Date().toISOString()
-    };
-
-    const signups = JSON.parse(localStorage.getItem("moodix_app_waitlist") || "[]");
-    signups.push(signup);
-    localStorage.setItem("moodix_app_waitlist", JSON.stringify(signups));
-
+    });
+    setJSON(storageKeys.waitlist, signups);
     form.reset();
     note.textContent = "Thanks for joining. Start your music adventure.";
   });
@@ -463,13 +515,16 @@ function setupSignup() {
 
 setupLogoPicker();
 setupLocalTime();
+setupSignin();
+requireSignin();
 setupDayForm();
 setupImportContext();
 setupSourceChips();
 setupIntentButtons();
 setupSignup();
+setupResultPage();
 
-document.querySelector("[data-generate-results]")?.addEventListener("click", generateResults);
+document.querySelector("[data-save-import]")?.addEventListener("click", saveImport);
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {

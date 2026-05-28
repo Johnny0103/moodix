@@ -6,9 +6,9 @@
     <meta name="theme-color" content="#101321">
     <meta
       name="description"
-      content="Moodix reads your day, finds one word for the mood, and turns your playlist into a top-five soundtrack."
+      content="Sign in to Moodix, check your daily mood, import music, and reveal a top-five soundtrack for today."
     >
-    <title>Moodix | Music for the day you are actually in</title>
+    <title>Moodix | Sign in and start today's music flow</title>
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="assets/apple-touch-icon.svg">
@@ -22,84 +22,74 @@
       </a>
       <nav class="nav-links" aria-label="Primary navigation">
         <a href="mood-check.html">Mood check</a>
-        <a href="import.html">Upload music</a>
+        <a href="import.html">Import</a>
+        <a href="result.html">Result</a>
         <a href="app-version.html">App version</a>
       </nav>
-      <a class="header-cta" href="mood-check.html">Start mood check</a>
+      <a class="header-cta" href="#signin">Sign in</a>
     </header>
 
     <main>
-      <section class="hero" aria-labelledby="hero-title">
+      <section class="hero signin-hero" aria-labelledby="hero-title">
         <img class="hero-image" src="assets/moodix-hero.png" alt="Music dashboard glowing on a laptop and phone with colorful playlist cards">
         <div class="hero-scrim" aria-hidden="true"></div>
         <div class="hero-content">
-          <p class="eyebrow">A daily mood reader for your music</p>
-          <h1 id="hero-title">Let today pick the songs.</h1>
+          <p class="eyebrow">Personal music mood flow</p>
+          <h1 id="hero-title">Sign in. Read today. Play the right five.</h1>
           <p class="hero-copy">
-            Moodix starts with the day you are in, asks a few quiet questions, gives your day one word, then turns your own playlist into five songs that fit.
+            Moodix uses your local weekday, a short emotional check-in, and your music source to build one daily word and five songs for today.
           </p>
-          <div class="hero-actions">
-            <a class="button primary" href="mood-check.html">Start mood check</a>
-            <a class="button secondary" href="#logo-options">Choose a logo</a>
-          </div>
         </div>
       </section>
 
-      <section class="section split-section" aria-labelledby="flow-title">
-        <div>
-          <p class="eyebrow">The new flow</p>
-          <h2 id="flow-title">One clean step at a time.</h2>
-        </div>
-        <div class="steps-grid">
-          <article>
-            <span>01</span>
-            <h3>Read today</h3>
-            <p>Local time shows your current day, then Moodix asks natural questions about what may happen.</p>
-          </article>
-          <article>
-            <span>02</span>
-            <h3>Name the feeling</h3>
-            <p>Your answers become one single word that describes the emotional color of the day.</p>
-          </article>
-          <article>
-            <span>03</span>
-            <h3>Upload music</h3>
-            <p>Choose a source, paste or upload a playlist, and get a ranked top five.</p>
-          </article>
-        </div>
-      </section>
-
-      <section id="logo-options" class="section logo-section" aria-labelledby="logo-title">
+      <section id="signin" class="section signin-section" aria-labelledby="signin-title">
         <div class="section-heading compact">
-          <p class="eyebrow">Brand direction</p>
-          <h2 id="logo-title">Choose a Moodix logo option.</h2>
-          <p>The choice saves in this browser and updates the mark across the prototype.</p>
+          <p class="eyebrow">Start here</p>
+          <h2 id="signin-title">Sign in to unlock today's steps.</h2>
+          <p data-signed-in-note>Prototype sign-in stores your name and email in this browser only.</p>
         </div>
-        <div class="logo-grid">
-          <button class="logo-choice active" type="button" data-logo-choice="pulse">
-            <span class="logo-preview" data-logo-preview="pulse"></span>
-            <strong>Pulse</strong>
-            <small>Best for a modern music app.</small>
-          </button>
-          <button class="logo-choice" type="button" data-logo-choice="orbit">
-            <span class="logo-preview" data-logo-preview="orbit"></span>
-            <strong>Orbit</strong>
-            <small>Best for a mood companion.</small>
-          </button>
-          <button class="logo-choice" type="button" data-logo-choice="wave">
-            <span class="logo-preview" data-logo-preview="wave"></span>
-            <strong>Wave</strong>
-            <small>Best for playlist utility.</small>
-          </button>
+
+        <div class="signin-layout">
+          <form class="signin-card" data-signin-form>
+            <label for="signin-name">Name</label>
+            <input id="signin-name" name="name" type="text" autocomplete="name" placeholder="Your name" required>
+            <label for="signin-email">Email</label>
+            <input id="signin-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+            <button class="button primary" type="submit">Sign in and start</button>
+            <p class="form-note" data-signin-note></p>
+          </form>
+
+          <div class="step-launcher" aria-label="Moodix step pages">
+            <a class="step-card locked" href="mood-check.html" data-step-link>
+              <span>01</span>
+              <strong>Mood check</strong>
+              <small>Answer direct and indirect questions for today.</small>
+            </a>
+            <a class="step-card locked" href="import.html" data-step-link>
+              <span>02</span>
+              <strong>Import music</strong>
+              <small>Connect a source or upload a playlist export.</small>
+            </a>
+            <a class="step-card locked" href="result.html" data-step-link>
+              <span>03</span>
+              <strong>Result</strong>
+              <small>Reveal the one-word analysis and top five songs.</small>
+            </a>
+            <a class="step-card locked" href="app-version.html" data-step-link>
+              <span>04</span>
+              <strong>App version</strong>
+              <small>Tell Moodix if you would join the app.</small>
+            </a>
+          </div>
         </div>
       </section>
     </main>
 
     <footer class="site-footer">
       <span>Moodix</span>
-      <a href="mood-check.html">Start your check-in</a>
+      <a href="mood-check.html">Start today's flow</a>
     </footer>
 
-    <script src="app.js?v=3" defer></script>
+    <script src="app.js?v=4" defer></script>
   </body>
 </html>

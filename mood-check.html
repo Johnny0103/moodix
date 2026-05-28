@@ -4,14 +4,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#101321">
-    <meta name="description" content="Answer a few Moodix questions and get one word for your day.">
-    <title>Moodix | Mood check</title>
+    <meta name="description" content="Answer Moodix questions and get today's emotional analysis.">
+    <title>Moodix | Step 1 mood check</title>
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="assets/apple-touch-icon.svg">
     <link rel="stylesheet" href="styles.css">
   </head>
-  <body>
+  <body data-requires-signin>
     <header class="site-header">
       <a class="brand" href="index.html" aria-label="Moodix home">
         <span class="brand-mark" data-brand-mark aria-hidden="true"></span>
@@ -19,18 +19,19 @@
       </a>
       <nav class="nav-links" aria-label="Primary navigation">
         <a href="mood-check.html">Mood check</a>
-        <a href="import.html">Upload music</a>
+        <a href="import.html">Import</a>
+        <a href="result.html">Result</a>
         <a href="app-version.html">App version</a>
       </nav>
-      <a class="header-cta" href="import.html">Upload music</a>
+      <a class="header-cta" href="import.html">Next: import</a>
     </header>
 
     <main>
       <section class="flow-hero" aria-labelledby="check-title">
         <div>
           <p class="eyebrow">Step 1 / Mood check</p>
-          <h1 id="check-title">What kind of day is this?</h1>
-          <p class="hero-copy">Moodix uses your local time to anchor the check-in, then reads your answers into one word.</p>
+          <h1 id="check-title">How do you feel today?</h1>
+          <p class="hero-copy">Start simple, then answer context questions so Moodix can infer the deeper emotional shape of your day.</p>
         </div>
         <aside class="today-card">
           <span data-local-weekday>Today</span>
@@ -42,20 +43,29 @@
       <section class="section question-section" aria-labelledby="question-title">
         <div class="flow-progress" aria-label="Moodix flow progress">
           <span class="active">Mood</span>
-          <span>Music</span>
-          <span>Top 5</span>
+          <span>Import</span>
+          <span>Result</span>
           <span>App</span>
         </div>
         <div class="section-heading compact">
-          <p class="eyebrow">A few personal questions</p>
-          <h2 id="question-title">Answer casually. Moodix will infer the mood.</h2>
+          <p class="eyebrow">Emotional analyzing AI</p>
+          <h2 id="question-title">Moodix asks indirectly, then gives one word.</h2>
         </div>
 
         <form class="question-card" data-day-form>
-          <label for="plans">Are you thinking of doing anything today?</label>
-          <textarea id="plans" name="plans" rows="3" placeholder="Maybe work, errands, gym, seeing someone, resting, studying..."></textarea>
+          <fieldset class="feeling-options">
+            <legend>How do you feel today?</legend>
+            <label><input type="radio" name="feeling" value="light" checked> Light</label>
+            <label><input type="radio" name="feeling" value="steady"> Steady</label>
+            <label><input type="radio" name="feeling" value="heavy"> Heavy</label>
+            <label><input type="radio" name="feeling" value="restless"> Restless</label>
+            <label><input type="radio" name="feeling" value="tender"> Tender</label>
+          </fieldset>
 
-          <label for="pace">What pace would feel good?</label>
+          <label for="plans">What are you doing today?</label>
+          <textarea id="plans" name="plans" rows="3" placeholder="Classes, work, errands, gym, meeting someone, resting, studying..."></textarea>
+
+          <label for="pace">What pace would help today feel better?</label>
           <select id="pace" name="pace">
             <option value="steady">Steady and manageable</option>
             <option value="slow">Slow and soft</option>
@@ -88,35 +98,27 @@
             <option value="move">Push my energy forward</option>
           </select>
 
+          <label for="success">What would make today feel successful?</label>
+          <textarea id="success" name="success" rows="3" placeholder="Making progress, feeling lighter, getting one thing done, having fun..."></textarea>
+
           <label for="mind">Anything sitting on your mind?</label>
           <textarea id="mind" name="mind" rows="3" placeholder="A deadline, a person, excitement, stress, nothing much..."></textarea>
 
-          <label for="success">What would make today feel successful?</label>
-          <textarea id="success" name="success" rows="3" placeholder="Getting one thing done, feeling lighter, making progress, having fun..."></textarea>
-
-          <label for="texture">Which space sounds closest to what you need?</label>
-          <select id="texture" name="texture">
-            <option value="clean">Clean, focused, and distraction-free</option>
-            <option value="warm">Warm, emotional, and personal</option>
-            <option value="open">Open, moving, and outside my head</option>
-            <option value="soft">Soft, quiet, and low-pressure</option>
-          </select>
-
-          <button class="button primary" type="submit">Analyze my day</button>
+          <button class="button primary" type="submit">Analyze my emotion</button>
         </form>
 
         <article class="analysis-card" data-analysis-card hidden>
-          <p class="eyebrow">Moodix word</p>
+          <p class="eyebrow">Saved for today's local date</p>
           <h2 data-day-word>Focused</h2>
-          <p data-day-summary>Your day has a steady, focused shape.</p>
+          <p data-day-summary>Your day has a focused shape.</p>
           <div class="analysis-detail">
             <span data-analysis-detail>Playlist matching will use this as the emotional filter.</span>
           </div>
-          <a class="button primary" href="import.html">Choose music upload option</a>
+          <a class="button primary" href="import.html">Continue to import</a>
         </article>
       </section>
     </main>
 
-    <script src="app.js?v=3" defer></script>
+    <script src="app.js?v=4" defer></script>
   </body>
 </html>
