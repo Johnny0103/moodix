@@ -22,7 +22,7 @@ const spotifyConfig = {
 const moodQuestions = [
   {
     name: "feeling",
-    question: "How do you feel today?",
+    question: "How are you feeling today?",
     options: [
       ["light", "Light", "Open, easy, a little bright"],
       ["steady", "Steady", "Balanced and manageable"],
@@ -312,7 +312,7 @@ function setupSignin() {
       document.body.classList.add("show-emotion-overlay");
       window.setTimeout(() => {
         window.location.href = "mood-check.html";
-      }, 5000);
+      }, 3000);
     } else {
       window.location.href = "mood-check.html";
     }
@@ -426,6 +426,8 @@ function setupDayForm() {
   const percent = document.querySelector("[data-wizard-percent]");
   const left = document.querySelector("[data-wizard-left]");
   const bar = document.querySelector("[data-wizard-bar]");
+  const next = document.querySelector("[data-wizard-next]");
+  const skip = document.querySelector("[data-wizard-skip]");
   if (!form || !card) return;
 
   if (!questionTarget) {
@@ -444,6 +446,7 @@ function setupDayForm() {
   }
 
   const answers = {};
+  let selectedAnswer = "";
   let step = 0;
 
   const saveAnalysis = () => {
@@ -490,16 +493,29 @@ function setupDayForm() {
         `).join("")}
       </div>
     `;
+    selectedAnswer = "";
     updateProgress();
   };
 
   questionTarget.addEventListener("click", (event) => {
     const option = event.target.closest("[data-answer]");
     if (!option) return;
-    answers[moodQuestions[step].name] = option.dataset.answer;
+    selectedAnswer = option.dataset.answer;
+    questionTarget.querySelectorAll("[data-answer]").forEach((button) => {
+      button.classList.toggle("selected", button === option);
+    });
+  });
+
+  const advance = (preferNot = false) => {
+    const question = moodQuestions[step];
+    if (!question) return;
+    answers[question.name] = preferNot ? question.options[0][0] : selectedAnswer || question.options[0][0];
     step += 1;
     renderStep();
-  });
+  };
+
+  next?.addEventListener("click", () => advance(false));
+  skip?.addEventListener("click", () => advance(true));
 
   form.addEventListener("submit", (event) => event.preventDefault());
   renderStep();
@@ -508,6 +524,7 @@ function setupDayForm() {
 function setupMoodMode() {
   const choices = document.querySelectorAll("[data-mode-choice]");
   const panels = document.querySelectorAll("[data-mode-panel]");
+  const modeGrid = document.querySelector(".mode-choice-grid");
   if (!choices.length) return;
 
   const setMode = (mode) => {
@@ -518,13 +535,16 @@ function setupMoodMode() {
     });
     document.querySelector("[data-analysis-card]")?.setAttribute("hidden", "");
     document.querySelector("[data-week-summary]")?.setAttribute("hidden", "");
+    if (modeGrid) modeGrid.hidden = true;
   };
 
   choices.forEach((choice) => {
     choice.addEventListener("click", () => setMode(choice.dataset.modeChoice));
   });
-
-  setMode(storageGet(storageKeys.checkMode) || "today");
+  panels.forEach((panel) => {
+    panel.hidden = true;
+  });
+  choices.forEach((choice) => choice.classList.remove("active"));
 }
 
 function weekDates() {
@@ -557,64 +577,50 @@ function renderWeekSummary(days) {
 }
 
 function setupWeekForm() {
-  const grid = document.querySelector("[data-week-grid]");
   const form = document.querySelector("[data-week-form]");
+  const questionTarget = document.querySelector("[data-week-wizard-question]");
+  const percent = document.querySelector("[data-week-wizard-percent]");
+  const left = document.querySelector("[data-week-wizard-left]");
+  const bar = document.querySelector("[data-week-wizard-bar]");
+  const next = document.querySelector("[data-week-wizard-next]");
+  const skip = document.querySelector("[data-week-wizard-skip]");
   const summary = document.querySelector("[data-week-summary]");
-  if (!grid || !form) return;
+  if (!form || !questionTarget) return;
 
-  grid.innerHTML = weekDates().map((day, index) => `
-    <article class="week-day-card">
-      <div>
-        <span>${day.label}</span>
-        <h3>${day.weekday}</h3>
-      </div>
-      <label for="week-${index}-feeling">Expected energy</label>
-      <select id="week-${index}-feeling" name="day-${index}-feeling">
-        <option value="steady">Steady</option>
-        <option value="light">Light</option>
-        <option value="heavy">Heavy</option>
-        <option value="restless">Restless</option>
-        <option value="tender">Tender</option>
-      </select>
-      <label for="week-${index}-plans">What might happen?</label>
-      <textarea id="week-${index}-plans" name="day-${index}-plans" rows="2" placeholder="Work, class, rest, gym, seeing people..."></textarea>
-      <label for="week-${index}-setting">Where will this day mostly happen?</label>
-      <select id="week-${index}-setting" name="day-${index}-setting">
-        <option value="work">Work or school</option>
-        <option value="home">Mostly at home</option>
-        <option value="outside">Moving around outside</option>
-        <option value="social">Around people</option>
-      </select>
-      <label for="week-${index}-need">Music should help with</label>
-      <select id="week-${index}-need" name="day-${index}-need">
-        <option value="focus">Focus</option>
-        <option value="lift">Lift</option>
-        <option value="settle">Settle</option>
-        <option value="feel">Feel</option>
-        <option value="move">Move</option>
-      </select>
-      <label for="week-${index}-success">What would make it feel successful?</label>
-      <textarea id="week-${index}-success" name="day-${index}-success" rows="2" placeholder="A win, a quiet night, seeing someone, moving forward..."></textarea>
-    </article>
-  `).join("");
+  const days = weekDates();
+  const answers = {};
+  const weekOptions = [
+    ["light", "Light", "Easy, optimistic, or open"],
+    ["steady", "Steady", "Balanced and predictable"],
+    ["heavy", "Heavy", "Slow, tired, or recovery-focused"],
+    ["restless", "Restless", "Busy, active, or high-energy"],
+    ["tender", "Tender", "Soft, personal, or emotional"]
+  ];
+  let selectedAnswer = "";
+  let step = 0;
 
-  const storedWeek = getJSON(storageKeys.weekAnalysis);
-  if (storageGet(storageKeys.checkMode) === "week" && storedWeek?.days?.length && storedWeek.days[0]?.stamp === weekDates()[0].stamp) {
-    renderWeekSummary(storedWeek.days);
-  }
+  const updateProgress = () => {
+    const completed = Math.min(step, days.length);
+    const completion = Math.round((completed / days.length) * 100);
+    if (percent) percent.textContent = `${completion}% complete`;
+    if (left) {
+      const remaining = days.length - completed;
+      left.textContent = remaining === 1 ? "1 day left" : `${remaining} days left`;
+    }
+    if (bar) bar.style.width = `${completion}%`;
+  };
 
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const data = new FormData(form);
-    const days = weekDates().map((day, index) => {
+  const saveWeek = () => {
+    const analyzedDays = days.map((day, index) => {
       const synthetic = new FormData();
-      synthetic.set("feeling", data.get(`day-${index}-feeling`) || "steady");
-      synthetic.set("plans", data.get(`day-${index}-plans`) || "");
-      synthetic.set("need", data.get(`day-${index}-need`) || "focus");
+      const feeling = answers[index] || "steady";
+      synthetic.set("feeling", feeling);
+      synthetic.set("plans", feeling === "restless" ? "busy errands movement" : feeling === "heavy" ? "rest recover quiet" : "week plan");
+      synthetic.set("need", feeling === "restless" ? "move" : feeling === "heavy" ? "settle" : "focus");
       synthetic.set("pace", "steady");
-      synthetic.set("setting", data.get(`day-${index}-setting`) || "work");
+      synthetic.set("setting", "work");
       synthetic.set("company", "solo");
-      synthetic.set("success", data.get(`day-${index}-success`) || data.get(`day-${index}-plans`) || "");
+      synthetic.set("success", "make the day feel manageable");
       synthetic.set("mind", "");
       const analysis = analyzeDay(synthetic, day);
       return {
@@ -623,17 +629,61 @@ function setupWeekForm() {
       };
     });
     storageSet(storageKeys.checkMode, "week");
-    if (days[0]?.analysis) setJSON(storageKeys.analysis, days[0].analysis);
+    if (analyzedDays[0]?.analysis) setJSON(storageKeys.analysis, analyzedDays[0].analysis);
     setJSON(storageKeys.weekAnalysis, {
       createdAt: new Date().toISOString(),
-      weekOf: days[0]?.stamp,
-      days
+      weekOf: analyzedDays[0]?.stamp,
+      days: analyzedDays
     });
-    renderWeekSummary(days);
+    renderWeekSummary(analyzedDays);
+    form.hidden = true;
     if (summary) {
       summary.scrollIntoView({ behavior: "smooth", block: "center" });
     }
+  };
+
+  const renderStep = () => {
+    const day = days[step];
+    if (!day) {
+      updateProgress();
+      saveWeek();
+      return;
+    }
+    questionTarget.innerHTML = `
+      <p class="eyebrow">Day ${step + 1} of ${days.length}</p>
+      <h2>What mood do you predict for ${day.weekday}?</h2>
+      <div class="wizard-options">
+        ${weekOptions.map(([value, label, hint]) => `
+          <button class="wizard-option" type="button" data-week-answer="${escapeHTML(value)}">
+            <strong>${escapeHTML(label)}</strong>
+            <small>${escapeHTML(hint)}</small>
+          </button>
+        `).join("")}
+      </div>
+    `;
+    selectedAnswer = "";
+    updateProgress();
+  };
+
+  questionTarget.addEventListener("click", (event) => {
+    const option = event.target.closest("[data-week-answer]");
+    if (!option) return;
+    selectedAnswer = option.dataset.weekAnswer;
+    questionTarget.querySelectorAll("[data-week-answer]").forEach((button) => {
+      button.classList.toggle("selected", button === option);
+    });
   });
+
+  const advance = (preferNot = false) => {
+    answers[step] = preferNot ? "steady" : selectedAnswer || "steady";
+    step += 1;
+    renderStep();
+  };
+
+  next?.addEventListener("click", () => advance(false));
+  skip?.addEventListener("click", () => advance(true));
+  form.addEventListener("submit", (event) => event.preventDefault());
+  renderStep();
 }
 
 function splitCsvLine(line) {
@@ -1069,6 +1119,6 @@ document.querySelector("[data-save-import]")?.addEventListener("click", saveImpo
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=8").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=9").catch(() => {});
   });
 }

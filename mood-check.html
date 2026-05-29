@@ -9,7 +9,10 @@
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="assets/apple-touch-icon.svg">
-    <link rel="stylesheet" href="styles.css?v=7">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=9">
   </head>
   <body data-requires-signin>
     <header class="site-header">
@@ -18,19 +21,15 @@
         <span>Moodix</span>
       </a>
       <nav class="nav-links" aria-label="Primary navigation">
-        <a href="mood-check.html">Mood check</a>
-        <a href="import.html">Import</a>
-        <a href="result.html">Result</a>
         <a href="app-version.html">App version</a>
       </nav>
-      <a class="header-cta" href="import.html">Next: import</a>
     </header>
 
     <main>
       <section class="flow-hero" aria-labelledby="check-title">
         <div>
           <p class="eyebrow">Step 1 / Mood check</p>
-          <h1 id="check-title">What do you want Moodix to read?</h1>
+          <h1 id="check-title">How are you feeling today?</h1>
           <p class="hero-copy">Start with today or map the whole week. Moodix uses your local date and timezone so the check-in matches the day you are actually in.</p>
         </div>
         <aside class="today-card">
@@ -55,20 +54,24 @@
         </div>
 
         <div class="mode-choice-grid">
-          <button class="mode-choice active" type="button" data-mode-choice="today">
+          <button class="mode-choice" type="button" data-mode-choice="today">
             <span>Today</span>
             <strong>Fill in today</strong>
             <small>Best for a quick daily song match.</small>
           </button>
           <button class="mode-choice" type="button" data-mode-choice="week">
             <span>Week</span>
-            <strong>Predict the whole week</strong>
+            <strong>Predict for week</strong>
             <small>Best for planning the emotional rhythm ahead.</small>
           </button>
         </div>
 
-        <form class="question-card mood-wizard" data-day-form data-mode-panel="today">
+        <form class="question-card mood-wizard" data-day-form data-mode-panel="today" hidden>
           <div class="wizard-question" data-wizard-question></div>
+          <div class="wizard-actions">
+            <button class="button secondary dark" type="button" data-wizard-skip>Prefer not to answer</button>
+            <button class="button primary" type="button" data-wizard-next>Next</button>
+          </div>
           <div class="wizard-progress" aria-live="polite">
             <div class="wizard-progress-top">
               <span data-wizard-percent>0% complete</span>
@@ -80,9 +83,21 @@
           </div>
         </form>
 
-        <form class="week-card" data-week-form data-mode-panel="week" hidden>
-          <div class="week-grid" data-week-grid></div>
-          <button class="button primary" type="submit">Analyze my week</button>
+        <form class="question-card mood-wizard" data-week-form data-mode-panel="week" hidden>
+          <div class="wizard-question" data-week-wizard-question></div>
+          <div class="wizard-actions">
+            <button class="button secondary dark" type="button" data-week-wizard-skip>Prefer not to answer</button>
+            <button class="button primary" type="button" data-week-wizard-next>Next</button>
+          </div>
+          <div class="wizard-progress" aria-live="polite">
+            <div class="wizard-progress-top">
+              <span data-week-wizard-percent>0% complete</span>
+              <small data-week-wizard-left>7 questions left</small>
+            </div>
+            <div class="wizard-progress-track" aria-hidden="true">
+              <span data-week-wizard-bar></span>
+            </div>
+          </div>
         </form>
 
         <article class="analysis-card" data-analysis-card hidden>
@@ -104,6 +119,6 @@
       </section>
     </main>
 
-    <script src="app.js?v=8" defer></script>
+    <script src="app.js?v=9" defer></script>
   </body>
 </html>

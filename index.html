@@ -12,7 +12,10 @@
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="assets/apple-touch-icon.svg">
-    <link rel="stylesheet" href="styles.css?v=7">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=9">
   </head>
   <body>
     <header class="site-header">
@@ -21,9 +24,6 @@
         <span>Moodix</span>
       </a>
       <nav class="nav-links" aria-label="Primary navigation">
-        <a href="mood-check.html">Mood check</a>
-        <a href="import.html">Import</a>
-        <a href="result.html">Result</a>
         <a href="app-version.html">App version</a>
       </nav>
       <a class="header-cta" href="#signin">Sign in</a>
@@ -35,8 +35,8 @@
         <div class="hero-scrim" aria-hidden="true"></div>
         <div class="gateway-content">
           <div class="hero-content">
-            <p class="eyebrow">Personal music mood flow</p>
-            <h1 id="hero-title">Sign in. Read today. Play the right five.</h1>
+            <p class="eyebrow">Personal playlist</p>
+            <h1 id="hero-title">go with your mood</h1>
             <p class="hero-copy">
               Moodix reads the emotional context of your day, asks one easy choice at a time, then helps recommend music that fits what you actually need.
             </p>
@@ -107,6 +107,6 @@
       <a href="mood-check.html">Start today's flow</a>
     </footer>
 
-    <script src="app.js?v=8" defer></script>
+    <script src="app.js?v=9" defer></script>
   </body>
 </html>
