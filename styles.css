@@ -276,6 +276,12 @@ h3 {
   padding: 0;
 }
 
+.gateway-content #hero-title {
+  max-width: 700px;
+  font-size: clamp(3.1rem, 8vw, 7.2rem);
+  line-height: 0.9;
+}
+
 .gateway-card {
   background: rgba(255, 250, 240, 0.96);
   color: var(--text);
