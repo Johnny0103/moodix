@@ -1162,10 +1162,27 @@ function setupSignup() {
   });
 }
 
+function setupScrollBoost() {
+  if (!document.body.matches("[data-scroll-boost]")) return;
+  const boostZone = () => window.innerHeight * 2.2;
+  const formSelector = "input, textarea, select, button, [contenteditable='true']";
+  window.addEventListener("wheel", (event) => {
+    if (event.ctrlKey || Math.abs(event.deltaY) < 1 || window.scrollY > boostZone()) return;
+    if (event.target.closest(formSelector)) return;
+    event.preventDefault();
+    window.scrollBy({
+      top: event.deltaY * 1.9,
+      left: 0,
+      behavior: "auto"
+    });
+  }, { passive: false });
+}
+
 setupLogoPicker();
 setupLocalTime();
 setupSignin();
 requireSignin();
+setupScrollBoost();
 setupDateIntro();
 setupDayForm();
 setupMoodMode();
@@ -1181,6 +1198,6 @@ document.querySelector("[data-save-import]")?.addEventListener("click", saveImpo
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=15").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=16").catch(() => {});
   });
 }

@@ -269,8 +269,8 @@ h3 {
   position: sticky;
   top: 72px;
   z-index: 0;
-  align-items: start;
-  min-height: calc(74vh - 72px);
+  align-items: center;
+  min-height: calc(100vh - 72px);
 }
 
 .gateway-content {
@@ -306,7 +306,7 @@ h3 {
   place-items: center;
   width: min(1120px, 100%);
   min-height: inherit;
-  padding-top: clamp(18px, 3vw, 34px);
+  padding-top: clamp(22px, 4vw, 46px);
   padding-bottom: clamp(40px, 6vw, 72px);
   text-align: center;
 }
@@ -1833,8 +1833,8 @@ main {
   }
 
   .home-hero {
-    align-items: start;
-    min-height: calc(70vh - 64px);
+    align-items: center;
+    min-height: calc(100vh - 64px);
   }
 
   .home-hero .gateway-content {
