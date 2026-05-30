@@ -1228,6 +1228,6 @@ document.querySelector("[data-save-import]")?.addEventListener("click", saveImpo
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=17").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=18").catch(() => {});
   });
 }
