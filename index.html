@@ -15,7 +15,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=11">
+    <link rel="stylesheet" href="styles.css?v=12">
   </head>
   <body>
     <header class="site-header">
@@ -30,21 +30,25 @@
     </header>
 
     <main>
-      <section class="hero signin-hero gateway-hero" aria-labelledby="hero-title">
+      <section class="hero signin-hero gateway-hero home-hero" aria-labelledby="hero-title">
         <img class="hero-image" src="assets/moodix-hero.png" alt="Music dashboard glowing on a laptop and phone with colorful playlist cards">
         <div class="hero-scrim" aria-hidden="true"></div>
         <div class="gateway-content">
           <div class="hero-content">
             <p class="eyebrow">Personal playlist</p>
-            <h1 id="hero-title">"go with your mood"</h1>
+            <h1 id="hero-title">"listen to your mood"</h1>
             <p class="hero-copy">
-              Moodix reads the emotional context of your day, asks one easy choice at a time, then helps recommend music that fits what you actually need.
+              Moodix reads the emotional context of your day and turns it into a personal music direction.
             </p>
           </div>
+        </div>
+      </section>
 
+      <section id="signin" class="section signin-section signin-overlap" aria-labelledby="signin-title">
+        <div class="signin-layout">
           <form class="signin-card gateway-card" data-signin-form>
             <p class="eyebrow">Start Moodix</p>
-            <h2>Enter your mood flow.</h2>
+            <h2 id="signin-title">Enter your mood flow.</h2>
             <p data-signed-in-note>Sign in once in this browser. After login, Moodix plays the full-screen emotion animation and opens mood check automatically.</p>
             <label for="signin-name">Name</label>
             <input id="signin-name" name="name" type="text" autocomplete="name" placeholder="Your name" required>
@@ -56,10 +60,11 @@
         </div>
       </section>
 
-      <section id="signin" class="section signin-section" aria-labelledby="signin-title">
+      <section class="section signin-section steps-section" aria-labelledby="steps-title">
         <div class="section-heading compact">
-          <h2 id="signin-title">Where to start.</h2>
-          <p>After login, these pages unlock for your daily check-in, music import, and result.</p>
+          <p class="eyebrow">Where to start</p>
+          <h2 id="steps-title">Three steps, one daily soundtrack.</h2>
+          <p>After login, Moodix unlocks your mood check, music import, and result flow.</p>
         </div>
 
         <div class="signin-layout">
@@ -78,11 +83,6 @@
               <span>03</span>
               <strong>Result</strong>
               <small>Reveal the one-word analysis and top five songs.</small>
-            </a>
-            <a class="step-card locked" href="app-version.html" data-step-link>
-              <span>04</span>
-              <strong>App version</strong>
-              <small>Tell Moodix if you would join the app.</small>
             </a>
           </div>
         </div>
@@ -106,6 +106,6 @@
       <a href="mood-check.html">Start today's flow</a>
     </footer>
 
-    <script src="app.js?v=11" defer></script>
+    <script src="app.js?v=12" defer></script>
   </body>
 </html>
