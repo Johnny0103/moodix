@@ -266,8 +266,11 @@ h3 {
 }
 
 .home-hero {
+  position: sticky;
+  top: 72px;
+  z-index: 0;
   align-items: center;
-  min-height: min(680px, calc(70vh - 32px));
+  min-height: calc(100vh - 72px);
 }
 
 .gateway-content {
@@ -369,18 +372,19 @@ h3 {
 
 .signin-overlap {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   display: grid;
   place-items: center;
-  min-height: min(680px, calc(70vh - 32px));
-  margin-top: calc(-1 * min(680px, calc(70vh - 32px)));
+  min-height: calc(100vh - 72px);
+  margin-top: 0;
   padding-top: clamp(82px, 12vw, 150px);
   padding-bottom: clamp(72px, 10vw, 130px);
   background:
-    radial-gradient(circle at 50% 32%, rgba(255, 209, 102, 0.2), transparent 30%),
-    radial-gradient(circle at 12% 70%, rgba(249, 115, 22, 0.18), transparent 24%),
-    linear-gradient(180deg, rgba(32, 21, 15, 0.14) 0%, rgba(32, 21, 15, 0.78) 30%, rgba(32, 21, 15, 0.92) 100%);
+    radial-gradient(circle at 50% 32%, rgba(255, 209, 102, 0.22), transparent 30%),
+    radial-gradient(circle at 12% 70%, rgba(249, 115, 22, 0.2), transparent 24%),
+    linear-gradient(180deg, rgba(32, 21, 15, 0.82) 0%, rgba(32, 21, 15, 0.94) 48%, rgba(32, 21, 15, 0.99) 100%);
   backdrop-filter: blur(16px);
+  box-shadow: 0 -38px 90px rgba(32, 21, 15, 0.36);
 }
 
 .signin-overlap::before {
