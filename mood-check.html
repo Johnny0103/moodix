@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=10">
+    <link rel="stylesheet" href="styles.css?v=11">
   </head>
   <body data-requires-signin>
     <header class="site-header">
@@ -25,11 +25,23 @@
       </nav>
     </header>
 
+    <section class="date-intro" data-date-intro hidden tabindex="0" role="button" aria-label="Continue to mood check">
+      <div class="date-intro-ring" aria-hidden="true"></div>
+      <div class="date-intro-glass" aria-hidden="true"></div>
+      <div class="date-intro-content">
+        <p class="eyebrow">Your local moment</p>
+        <strong data-intro-weekday>Today</strong>
+        <span data-intro-date>Local date</span>
+        <time data-intro-time datetime="">Local time</time>
+        <small>Click anywhere to continue</small>
+      </div>
+    </section>
+
     <main>
       <section class="flow-hero" aria-labelledby="check-title">
         <div>
           <p class="eyebrow">Step 1 / Mood check</p>
-          <h1 id="check-title">How are you feeling today?</h1>
+          <h1 id="check-title" tabindex="-1">How are you feeling today?</h1>
           <p class="hero-copy">Start with today or map the whole week. Moodix uses your local date and timezone so the check-in matches the day you are actually in.</p>
         </div>
         <aside class="today-card">
@@ -119,6 +131,6 @@
       </section>
     </main>
 
-    <script src="app.js?v=10" defer></script>
+    <script src="app.js?v=11" defer></script>
   </body>
 </html>

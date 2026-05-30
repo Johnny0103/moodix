@@ -7,6 +7,7 @@ const storageKeys = {
   waitlist: "moodix_app_waitlist",
   checkMode: "moodix_check_mode",
   weekAnalysis: "moodix_week_analysis",
+  introStamp: "moodix_intro_stamp",
   spotifyToken: "moodix_spotify_token",
   spotifyVerifier: "moodix_spotify_verifier",
   spotifyState: "moodix_spotify_state"
@@ -311,10 +312,70 @@ function setupSignin() {
       overlay.classList.add("active");
       document.body.classList.add("show-emotion-overlay");
       window.setTimeout(() => {
-        window.location.href = "mood-check.html";
+        window.location.href = "mood-check.html?intro=1";
       }, 3000);
     } else {
-      window.location.href = "mood-check.html";
+      window.location.href = "mood-check.html?intro=1";
+    }
+  });
+}
+
+function setupDateIntro() {
+  const intro = document.querySelector("[data-date-intro]");
+  if (!intro || !getUser()) return;
+
+  const params = new URLSearchParams(window.location.search);
+  const meta = getLocalDayMeta();
+  const shouldShow = params.get("intro") === "1" || storageGet(storageKeys.introStamp) !== meta.stamp;
+  if (!shouldShow) return;
+
+  const weekdayTarget = intro.querySelector("[data-intro-weekday]");
+  const dateTarget = intro.querySelector("[data-intro-date]");
+  const timeTarget = intro.querySelector("[data-intro-time]");
+  let finished = false;
+
+  const updateTime = () => {
+    const now = new Date();
+    const liveMeta = getLocalDayMeta();
+    if (weekdayTarget) weekdayTarget.textContent = liveMeta.weekday;
+    if (dateTarget) dateTarget.textContent = liveMeta.date;
+    if (timeTarget) {
+      timeTarget.textContent = now.toLocaleTimeString(undefined, {
+        hour: "numeric",
+        minute: "2-digit",
+        second: "2-digit"
+      });
+      timeTarget.setAttribute("datetime", now.toISOString());
+    }
+  };
+
+  const finishIntro = () => {
+    if (finished) return;
+    finished = true;
+    window.clearInterval(timer);
+    storageSet(storageKeys.introStamp, localDayStamp());
+    intro.classList.add("is-leaving");
+    document.body.classList.add("date-intro-revealing");
+    window.setTimeout(() => {
+      intro.hidden = true;
+      document.body.classList.remove("date-intro-active", "date-intro-revealing");
+      document.getElementById("check-title")?.focus({ preventScroll: true });
+      if (params.get("intro") === "1") {
+        window.history.replaceState({}, "", "mood-check.html");
+      }
+    }, 820);
+  };
+
+  updateTime();
+  const timer = window.setInterval(updateTime, 1000);
+  intro.hidden = false;
+  document.body.classList.add("date-intro-active");
+  intro.focus({ preventScroll: true });
+  intro.addEventListener("click", finishIntro);
+  intro.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      finishIntro();
     }
   });
 }
@@ -1105,6 +1166,7 @@ setupLogoPicker();
 setupLocalTime();
 setupSignin();
 requireSignin();
+setupDateIntro();
 setupDayForm();
 setupMoodMode();
 setupWeekForm();
@@ -1119,6 +1181,6 @@ document.querySelector("[data-save-import]")?.addEventListener("click", saveImpo
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=10").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=11").catch(() => {});
   });
 }
