@@ -1164,17 +1164,47 @@ function setupSignup() {
 
 function setupScrollBoost() {
   if (!document.body.matches("[data-scroll-boost]")) return;
-  const boostZone = () => window.innerHeight * 2.2;
+  const signin = document.querySelector("#signin");
   const formSelector = "input, textarea, select, button, [contenteditable='true']";
+  let turningPage = false;
+
+  const turnToSignin = () => {
+    if (!signin || turningPage) return;
+    turningPage = true;
+    signin.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.setTimeout(() => {
+      turningPage = false;
+    }, 900);
+  };
+
   window.addEventListener("wheel", (event) => {
-    if (event.ctrlKey || Math.abs(event.deltaY) < 1 || window.scrollY > boostZone()) return;
-    if (event.target.closest(formSelector)) return;
-    event.preventDefault();
-    window.scrollBy({
-      top: event.deltaY * 1.9,
-      left: 0,
-      behavior: "auto"
-    });
+    if (event.ctrlKey || Math.abs(event.deltaY) < 1) return;
+    if (event.target.closest?.(formSelector)) return;
+    if (event.deltaY > 0 && window.scrollY < window.innerHeight * 0.25) {
+      event.preventDefault();
+      turnToSignin();
+      return;
+    }
+    if (event.deltaY < 0 && window.scrollY < window.innerHeight * 1.35) {
+      event.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+  }, { passive: false });
+
+  window.addEventListener("touchstart", (event) => {
+    window.moodixTouchStart = event.touches?.[0]?.clientY || 0;
+  }, { passive: true });
+
+  window.addEventListener("touchmove", (event) => {
+    if (event.target.closest?.(formSelector)) return;
+    const start = window.moodixTouchStart || 0;
+    const current = event.touches?.[0]?.clientY || start;
+    const distance = start - current;
+    if (distance > 18 && window.scrollY < window.innerHeight * 0.25) {
+      event.preventDefault();
+      turnToSignin();
+    }
   }, { passive: false });
 }
 
@@ -1198,6 +1228,6 @@ document.querySelector("[data-save-import]")?.addEventListener("click", saveImpo
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=16").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=17").catch(() => {});
   });
 }
