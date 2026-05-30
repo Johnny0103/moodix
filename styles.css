@@ -267,7 +267,7 @@ h3 {
 
 .home-hero {
   align-items: center;
-  min-height: min(650px, calc(66vh - 32px));
+  min-height: min(680px, calc(70vh - 32px));
 }
 
 .gateway-content {
@@ -370,12 +370,40 @@ h3 {
 .signin-overlap {
   position: relative;
   z-index: 2;
-  margin-top: clamp(-118px, -9vw, -68px);
-  padding-top: 0;
-  padding-bottom: clamp(48px, 8vw, 86px);
+  display: grid;
+  place-items: center;
+  min-height: min(680px, calc(70vh - 32px));
+  margin-top: calc(-1 * min(680px, calc(70vh - 32px)));
+  padding-top: clamp(82px, 12vw, 150px);
+  padding-bottom: clamp(72px, 10vw, 130px);
   background:
-    linear-gradient(180deg, transparent 0%, var(--paper) 74%),
-    radial-gradient(circle at 50% 16%, rgba(255, 209, 102, 0.22), transparent 24%);
+    radial-gradient(circle at 50% 32%, rgba(255, 209, 102, 0.2), transparent 30%),
+    radial-gradient(circle at 12% 70%, rgba(249, 115, 22, 0.18), transparent 24%),
+    linear-gradient(180deg, rgba(32, 21, 15, 0.14) 0%, rgba(32, 21, 15, 0.78) 30%, rgba(32, 21, 15, 0.92) 100%);
+  backdrop-filter: blur(16px);
+}
+
+.signin-overlap::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 250, 240, 0.02), rgba(255, 250, 240, 0.13)),
+    radial-gradient(circle at 50% 50%, rgba(255, 176, 0, 0.18), transparent 34%);
+  pointer-events: none;
+}
+
+.signin-overlap::after {
+  content: "";
+  position: absolute;
+  right: clamp(18px, 8vw, 120px);
+  bottom: clamp(18px, 7vw, 92px);
+  width: min(220px, 34vw);
+  aspect-ratio: 1;
+  border: 1px solid rgba(255, 209, 102, 0.22);
+  border-radius: 50%;
+  box-shadow: inset 0 0 60px rgba(255, 209, 102, 0.1), 0 0 90px rgba(249, 115, 22, 0.18);
+  pointer-events: none;
 }
 
 .signin-layout {
@@ -388,6 +416,8 @@ h3 {
 }
 
 .signin-overlap .signin-layout {
+  position: relative;
+  z-index: 1;
   width: min(600px, calc(100% - 28px));
 }
 
