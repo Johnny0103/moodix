@@ -269,8 +269,8 @@ h3 {
   position: sticky;
   top: 72px;
   z-index: 0;
-  align-items: center;
-  min-height: calc(100vh - 72px);
+  align-items: start;
+  min-height: calc(74vh - 72px);
 }
 
 .gateway-content {
@@ -305,7 +305,9 @@ h3 {
   grid-template-columns: 1fr;
   place-items: center;
   width: min(1120px, 100%);
-  padding-block: clamp(54px, 8vw, 92px);
+  min-height: inherit;
+  padding-top: clamp(18px, 3vw, 34px);
+  padding-bottom: clamp(40px, 6vw, 72px);
   text-align: center;
 }
 
@@ -315,10 +317,13 @@ h3 {
 }
 
 .home-hero #hero-title {
-  max-width: 1040px;
-  font-size: clamp(3.8rem, 10vw, 9.4rem);
-  line-height: 0.88;
-  text-shadow: 0 24px 80px rgba(255, 176, 0, 0.22);
+  max-width: 900px;
+  margin-bottom: 14px;
+  font-size: clamp(3rem, 7.6vw, 7.2rem);
+  line-height: 0.92;
+  text-shadow:
+    0 18px 60px rgba(255, 176, 0, 0.24),
+    0 2px 0 rgba(255, 250, 240, 0.06);
 }
 
 .home-hero .hero-copy {
@@ -1825,6 +1830,17 @@ main {
   .hero {
     min-height: 720px;
     align-items: flex-end;
+  }
+
+  .home-hero {
+    align-items: start;
+    min-height: calc(70vh - 64px);
+  }
+
+  .home-hero .gateway-content {
+    min-height: inherit;
+    padding-top: 20px;
+    padding-bottom: 42px;
   }
 
   .hero-scrim {
