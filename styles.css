@@ -1021,14 +1021,27 @@ main {
 
 .flow-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
-  gap: clamp(28px, 6vw, 76px);
-  align-items: end;
-  padding: clamp(68px, 10vw, 118px) clamp(18px, 6vw, 78px);
+  grid-template-columns: minmax(0, 760px) minmax(240px, 320px);
+  gap: clamp(24px, 5vw, 56px);
+  align-items: center;
+  justify-content: center;
+  min-height: min(560px, calc(100vh - 72px));
+  padding: clamp(54px, 8vw, 86px) clamp(18px, 6vw, 78px);
   background:
     radial-gradient(circle at 14% 22%, rgba(255, 209, 102, 0.3), transparent 28%),
     radial-gradient(circle at 82% 52%, rgba(249, 115, 22, 0.18), transparent 34%),
     var(--night);
+}
+
+.flow-hero h1 {
+  max-width: 760px;
+  margin-bottom: 18px;
+  font-size: clamp(3rem, 6vw, 6.4rem);
+  line-height: 0.96;
+}
+
+#check-title:focus {
+  outline: none;
 }
 
 .flow-hero.compact-flow {
@@ -1036,7 +1049,7 @@ main {
 }
 
 .today-card {
-  padding: 24px;
+  padding: 20px;
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.14);
   color: var(--ink);
@@ -1051,7 +1064,7 @@ main {
 .today-card strong {
   display: block;
   margin: 10px 0;
-  font-size: clamp(2rem, 4vw, 3.4rem);
+  font-size: clamp(1.7rem, 3vw, 2.7rem);
   line-height: 1;
 }
 
