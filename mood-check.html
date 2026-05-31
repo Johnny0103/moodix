@@ -11,8 +11,8 @@
     <link rel="apple-touch-icon" href="assets/apple-touch-icon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=26">
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Manrope:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=27">
   </head>
   <body data-requires-signin>
     <header class="site-header">
@@ -23,6 +23,11 @@
       <nav class="nav-links" aria-label="Primary navigation">
         <a href="app-version.html">App version</a>
       </nav>
+      <div class="header-time-pill" aria-label="Local date and time">
+        <span data-local-weekday>Today</span>
+        <strong data-local-date>Loading local date</strong>
+        <small data-local-time>Local time</small>
+      </div>
     </header>
 
     <section class="date-intro" data-date-intro hidden tabindex="0" role="button" aria-label="Continue to mood check">
@@ -38,17 +43,12 @@
     </section>
 
     <main>
-      <section class="flow-hero" aria-labelledby="check-title">
+      <section class="flow-hero mood-check-hero" aria-labelledby="check-title">
         <div>
           <p class="eyebrow">Step 1 / Mood check</p>
           <h1 id="check-title" tabindex="-1">How are you feeling today?</h1>
           <p class="hero-copy">Start with today or map the whole week. Moodix uses your local date and timezone so the check-in matches the day you are actually in.</p>
         </div>
-        <aside class="today-card">
-          <span data-local-weekday>Today</span>
-          <strong data-local-date>Loading local date</strong>
-          <small data-local-time>Local time</small>
-        </aside>
       </section>
 
       <section class="section question-section" aria-labelledby="mode-title">
@@ -131,6 +131,6 @@
       </section>
     </main>
 
-    <script src="app.js?v=26" defer></script>
+    <script src="app.js?v=27" defer></script>
   </body>
 </html>
