@@ -541,11 +541,14 @@ h3 {
 
 .date-intro-content strong {
   display: block;
-  max-width: 100%;
-  font-family: Syne, Manrope, sans-serif;
-  font-size: clamp(2.8rem, 5.6vw, 5.2rem);
+  width: 100%;
+  max-width: 480px;
+  margin-inline: auto;
+  font-family: Manrope, Syne, sans-serif;
+  font-size: clamp(2.6rem, 4.2vw, 4.3rem);
   font-weight: 800;
-  line-height: 0.94;
+  line-height: 1;
+  text-align: center;
   white-space: nowrap;
   text-shadow: 0 16px 54px rgba(255, 176, 0, 0.32);
 }
