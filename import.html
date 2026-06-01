@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=27">
+    <link rel="stylesheet" href="styles.css?v=28">
   </head>
   <body data-requires-signin>
     <header class="site-header">
@@ -29,7 +29,7 @@
       <section class="flow-hero compact-flow" aria-labelledby="import-title">
         <div>
           <p class="eyebrow">Step 2 / Import</p>
-          <h1 id="import-title">Connect your music source.</h1>
+          <h1 id="import-title">Import with less typing.</h1>
           <p class="hero-copy" data-import-context>Your Moodix word will shape the ranking.</p>
         </div>
         <aside class="today-card">
@@ -49,18 +49,46 @@
 
         <div class="section-heading compact">
           <p class="eyebrow">Music authorization</p>
-          <h2>Choose a provider or upload manually.</h2>
-          <p>Spotify can connect with PKCE once your Spotify Client ID is added. CSV and pasted tracks remain the working fallback.</p>
+          <h2>Choose a direct path, then keep manual upload as backup.</h2>
+          <p>YouTube and Last.fm are the most realistic low-cost imports right now. Spotify and Apple stay ready for later platform access.</p>
         </div>
 
         <div class="source-picker" aria-label="Prototype music source options">
-          <button class="source-card active" type="button" data-source="Spotify"><span>Spotify</span><small>PKCE connect path</small></button>
-          <button class="source-card" type="button" data-source="Apple Music"><span>Apple Music</span><small>MusicKit authorization hook</small></button>
-          <button class="source-card" type="button" data-source="YouTube Music"><span>YouTube Music</span><small>Setup guide for later</small></button>
+          <button class="source-card active" type="button" data-source="YouTube Music"><span>YouTube / YouTube Music</span><small>Direct Google playlist import</small></button>
+          <button class="source-card" type="button" data-source="Last.fm"><span>Last.fm</span><small>Import top or loved tracks</small></button>
+          <button class="source-card" type="button" data-source="Spotify"><span>Spotify</span><small>Ready when Web API unlocks</small></button>
         </div>
 
         <div class="upload-layout">
           <div class="upload-box">
+            <div class="connect-card youtube-connect-card">
+              <div>
+                <p class="eyebrow">Most convenient free path</p>
+                <h3>Connect YouTube playlists.</h3>
+                <p data-youtube-status>Add a Google OAuth Client ID to activate direct YouTube and YouTube Music playlist import.</p>
+              </div>
+              <button class="button primary" type="button" data-youtube-connect>Connect YouTube</button>
+              <div class="provider-playlists" data-youtube-playlists hidden></div>
+              <p class="helper-text">
+                Google redirect/origin setup:
+                <strong>Authorized JavaScript origin: https://johnny0103.github.io</strong>
+              </p>
+            </div>
+
+            <div class="connect-card lastfm-connect-card">
+              <div>
+                <p class="eyebrow">No playlist permission needed</p>
+                <h3>Import Last.fm history.</h3>
+                <p data-lastfm-status>Enter a Last.fm username to import public top tracks or loved tracks once an API key is configured.</p>
+              </div>
+              <label for="lastfm-username">Last.fm username</label>
+              <div class="inline-import-row">
+                <input id="lastfm-username" type="text" placeholder="yourusername" data-lastfm-username>
+                <button class="button secondary dark" type="button" data-lastfm-top>Top tracks</button>
+                <button class="button secondary dark" type="button" data-lastfm-loved>Loved tracks</button>
+              </div>
+            </div>
+
             <div class="spotify-connect-card">
               <div>
                 <p class="eyebrow">Spotify direct import</p>
@@ -85,25 +113,33 @@ Good Days, SZA, reflective, medium, r&b, unwind
 Levitating, Dua Lipa, bright, high, dance, workout
 Intro, The xx, focused, medium, indie electronic, work</textarea>
             <button class="button primary" type="button" data-save-import>Save music import</button>
-            <p class="helper-text" data-import-note>Prototype source: <strong data-selected-source>Spotify</strong>. Real provider tokens are not stored.</p>
+            <p class="helper-text" data-import-note>Prototype source: <strong data-selected-source>YouTube Music</strong>. Real provider tokens are not stored permanently.</p>
           </div>
 
           <section class="auth-panel" aria-labelledby="auth-title">
             <p class="eyebrow">Connection status</p>
-            <h2 id="auth-title">Ready for Spotify or manual matching.</h2>
-            <p data-auth-note>Spotify uses Authorization Code with PKCE and no client secret in the browser. YouTube Music stays as setup guidance for now.</p>
+            <h2 id="auth-title">Start with YouTube, then Last.fm.</h2>
+            <p data-auth-note>YouTube uses Google OAuth in the browser. Last.fm can import public listening history with a free API key. CSV and paste remain the safest fallback.</p>
             <div class="auth-steps">
-              <strong>To authorize Spotify</strong>
+              <strong>To authorize YouTube / YouTube Music</strong>
+              <ol>
+                <li>Create a Google Cloud project.</li>
+                <li>Enable YouTube Data API v3.</li>
+                <li>Create an OAuth Client ID for a web app.</li>
+                <li>Add <code>https://johnny0103.github.io</code> as an authorized JavaScript origin.</li>
+                <li>Copy the Client ID into the Moodix YouTube config.</li>
+              </ol>
+              <strong>To authorize Last.fm</strong>
+              <ol>
+                <li>Create a free Last.fm API account.</li>
+                <li>Copy the API key into the Moodix Last.fm config.</li>
+                <li>Users can import from public usernames without typing full playlists.</li>
+              </ol>
+              <strong>Spotify later</strong>
               <ol>
                 <li>Create a Spotify Developer app.</li>
                 <li>Add the redirect URI shown on this page.</li>
                 <li>Copy the Client ID into the Moodix Spotify config.</li>
-              </ol>
-              <strong>For YouTube later</strong>
-              <ol>
-                <li>Create a Google Cloud OAuth client.</li>
-                <li>Enable the YouTube Data API.</li>
-                <li>Use YouTube playlist scopes; YouTube Music itself has no simple public playlist import API here.</li>
               </ol>
             </div>
             <a class="button secondary dark" href="result.html" data-result-link hidden>Continue to result</a>
@@ -112,6 +148,7 @@ Intro, The xx, focused, medium, indie electronic, work</textarea>
       </section>
     </main>
 
-    <script src="app.js?v=27" defer></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="app.js?v=28" defer></script>
   </body>
 </html>

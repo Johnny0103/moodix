@@ -10,7 +10,9 @@ const storageKeys = {
   introStamp: "moodix_intro_stamp",
   spotifyToken: "moodix_spotify_token",
   spotifyVerifier: "moodix_spotify_verifier",
-  spotifyState: "moodix_spotify_state"
+  spotifyState: "moodix_spotify_state",
+  youtubeToken: "moodix_youtube_token",
+  lastfmUsername: "moodix_lastfm_username"
 };
 
 const memoryStorage = {};
@@ -18,6 +20,13 @@ const spotifyConfig = {
   clientId: "",
   scopes: ["playlist-read-private", "playlist-read-collaborative"],
   redirectUri: "https://johnny0103.github.io/moodix/import.html"
+};
+const youtubeConfig = {
+  clientId: "",
+  scopes: "https://www.googleapis.com/auth/youtube.readonly"
+};
+const lastfmConfig = {
+  apiKey: ""
 };
 
 const moodQuestions = [
@@ -1021,18 +1030,294 @@ async function setupSpotifyImport() {
   }
 }
 
+function getYouTubeClientId() {
+  return window.MOODIX_YOUTUBE_CLIENT_ID || youtubeConfig.clientId;
+}
+
+function getYouTubeAccessToken() {
+  const token = getJSON(storageKeys.youtubeToken);
+  if (!token?.accessToken || Date.now() > token.expiresAt) return null;
+  return token.accessToken;
+}
+
+function setYouTubeAccessToken(accessToken, expiresIn) {
+  setJSON(storageKeys.youtubeToken, {
+    accessToken,
+    expiresAt: Date.now() + (expiresIn || 3600) * 1000
+  });
+}
+
+async function youtubeFetch(path, params = {}) {
+  const token = getYouTubeAccessToken();
+  if (!token) throw new Error("Connect YouTube again to refresh access.");
+  const query = new URLSearchParams(params);
+  const response = await fetch(`https://www.googleapis.com/youtube/v3/${path}?${query.toString()}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!response.ok) throw new Error("YouTube request failed. Check your OAuth setup and API access.");
+  return response.json();
+}
+
+function youtubeItemToSong(item) {
+  const snippet = item.snippet || {};
+  return {
+    title: snippet.title || "Untitled track",
+    artist: snippet.videoOwnerChannelTitle || snippet.channelTitle || "YouTube",
+    mood: "",
+    energy: "",
+    genre: "youtube",
+    activity: ""
+  };
+}
+
+function normalizeImportedTracks(tracks) {
+  return tracks
+    .filter((song) => song.title && song.artist && !/deleted video|private video/i.test(song.title))
+    .map((song) => ({
+      ...song,
+      mood: song.mood || inferMood(song),
+      energy: song.energy || inferEnergy(song),
+      genre: normalize(song.genre),
+      activity: normalize(song.activity)
+    }));
+}
+
+async function loadYouTubePlaylist(playlistId) {
+  const note = document.querySelector("[data-import-note]");
+  const link = document.querySelector("[data-result-link]");
+  const data = await youtubeFetch("playlistItems", {
+    part: "snippet",
+    playlistId,
+    maxResults: "50"
+  });
+  const tracks = normalizeImportedTracks((data.items || []).map(youtubeItemToSong));
+  setJSON(storageKeys.tracks, tracks.length ? tracks : demoSongs);
+  storageSet(storageKeys.source, "YouTube Music");
+  if (note) note.innerHTML = `Imported <strong>${tracks.length || demoSongs.length}</strong> tracks from <strong>YouTube</strong>.`;
+  link?.removeAttribute("hidden");
+}
+
+function renderYouTubePlaylists(playlists) {
+  const target = document.querySelector("[data-youtube-playlists]");
+  if (!target) return;
+  target.innerHTML = `
+    <strong>Choose a YouTube playlist</strong>
+    <div class="provider-playlist-list">
+      ${playlists.map((playlist) => `
+        <button type="button" data-youtube-playlist="${escapeHTML(playlist.id)}">
+          <span>${escapeHTML(playlist.snippet?.title || "Untitled playlist")}</span>
+          <small>${playlist.contentDetails?.itemCount || 0} tracks</small>
+        </button>
+      `).join("")}
+    </div>
+  `;
+  target.hidden = false;
+}
+
+async function loadYouTubePlaylists() {
+  const status = document.querySelector("[data-youtube-status]");
+  const data = await youtubeFetch("playlists", {
+    part: "snippet,contentDetails",
+    mine: "true",
+    maxResults: "25"
+  });
+  renderYouTubePlaylists(data.items || []);
+  if (status) status.textContent = "YouTube connected. Choose a playlist below to import tracks.";
+}
+
+function startYouTubeAuth() {
+  const status = document.querySelector("[data-youtube-status]");
+  const clientId = getYouTubeClientId();
+  if (!clientId) {
+    if (status) {
+      status.innerHTML = "YouTube direct import needs a Google OAuth Client ID. Add it to <strong>youtubeConfig.clientId</strong> in app.js, then add <strong>https://johnny0103.github.io</strong> as the authorized JavaScript origin in Google Cloud.";
+    }
+    return;
+  }
+  if (!window.google?.accounts?.oauth2) {
+    if (status) status.textContent = "Google sign-in script is still loading. Try again in a second.";
+    return;
+  }
+  const client = window.google.accounts.oauth2.initTokenClient({
+    client_id: clientId,
+    scope: youtubeConfig.scopes,
+    callback: async (response) => {
+      if (response.error) {
+        if (status) status.textContent = response.error;
+        return;
+      }
+      setYouTubeAccessToken(response.access_token, response.expires_in);
+      try {
+        await loadYouTubePlaylists();
+      } catch (error) {
+        if (status) status.textContent = error.message;
+      }
+    }
+  });
+  client.requestAccessToken();
+}
+
+function setupYouTubeImport() {
+  const connect = document.querySelector("[data-youtube-connect]");
+  const status = document.querySelector("[data-youtube-status]");
+  const playlistTarget = document.querySelector("[data-youtube-playlists]");
+  if (!connect && !status && !playlistTarget) return;
+
+  if (!getYouTubeClientId() && status) {
+    status.innerHTML = "YouTube import is ready for setup. Add a Google OAuth Client ID in <strong>app.js</strong> to let users connect playlists directly.";
+  }
+
+  connect?.addEventListener("click", startYouTubeAuth);
+  playlistTarget?.addEventListener("click", async (event) => {
+    const button = event.target.closest("[data-youtube-playlist]");
+    if (!button) return;
+    button.disabled = true;
+    button.textContent = "Importing...";
+    try {
+      await loadYouTubePlaylist(button.dataset.youtubePlaylist);
+    } catch (error) {
+      if (status) status.textContent = error.message;
+    }
+  });
+
+  if (getYouTubeAccessToken()) {
+    loadYouTubePlaylists().catch((error) => {
+      if (status) status.textContent = error.message;
+    });
+  }
+}
+
+function getLastfmApiKey() {
+  return window.MOODIX_LASTFM_API_KEY || lastfmConfig.apiKey;
+}
+
+async function lastfmFetch(method, username) {
+  const apiKey = getLastfmApiKey();
+  if (!apiKey) throw new Error("Add a free Last.fm API key to lastfmConfig.apiKey before importing.");
+  const params = new URLSearchParams({
+    method,
+    user: username,
+    api_key: apiKey,
+    format: "json",
+    limit: "50"
+  });
+  let data;
+  try {
+    const response = await fetch(`https://ws.audioscrobbler.com/2.0/?${params.toString()}`);
+    if (!response.ok) throw new Error("Last.fm request failed.");
+    data = await response.json();
+  } catch (error) {
+    data = await lastfmJsonp(params);
+  }
+  if (data.error) throw new Error(data.message || "Last.fm import failed.");
+  return data;
+}
+
+function lastfmJsonp(params) {
+  return new Promise((resolve, reject) => {
+    const callback = `moodixLastfm${Date.now()}${Math.floor(Math.random() * 1000)}`;
+    const script = document.createElement("script");
+    const timeout = window.setTimeout(() => {
+      delete window[callback];
+      script.remove();
+      reject(new Error("Last.fm request timed out."));
+    }, 10000);
+    window[callback] = (data) => {
+      window.clearTimeout(timeout);
+      delete window[callback];
+      script.remove();
+      resolve(data);
+    };
+    params.set("callback", callback);
+    script.src = `https://ws.audioscrobbler.com/2.0/?${params.toString()}`;
+    script.onerror = () => {
+      window.clearTimeout(timeout);
+      delete window[callback];
+      script.remove();
+      reject(new Error("Last.fm request failed."));
+    };
+    document.head.appendChild(script);
+  });
+}
+
+function lastfmTrackToSong(track) {
+  return {
+    title: track.name || "Untitled track",
+    artist: track.artist?.name || track.artist?.["#text"] || "Unknown artist",
+    mood: "",
+    energy: "",
+    genre: "lastfm",
+    activity: ""
+  };
+}
+
+async function importLastfm(method) {
+  const input = document.querySelector("[data-lastfm-username]");
+  const status = document.querySelector("[data-lastfm-status]");
+  const note = document.querySelector("[data-import-note]");
+  const link = document.querySelector("[data-result-link]");
+  const username = input?.value.trim() || storageGet(storageKeys.lastfmUsername);
+  if (!username) {
+    if (status) status.textContent = "Enter a Last.fm username first.";
+    return;
+  }
+  storageSet(storageKeys.lastfmUsername, username);
+  if (status) status.textContent = "Importing Last.fm tracks...";
+  const data = await lastfmFetch(method, username);
+  const list = method === "user.getlovedtracks" ? data.lovedtracks?.track : data.toptracks?.track;
+  const tracks = normalizeImportedTracks((list || []).map(lastfmTrackToSong));
+  setJSON(storageKeys.tracks, tracks.length ? tracks : demoSongs);
+  storageSet(storageKeys.source, "Last.fm");
+  if (status) status.textContent = `Imported ${tracks.length || demoSongs.length} tracks from Last.fm.`;
+  if (note) note.innerHTML = `Imported <strong>${tracks.length || demoSongs.length}</strong> tracks from <strong>Last.fm</strong>.`;
+  link?.removeAttribute("hidden");
+}
+
+function setupLastfmImport() {
+  const input = document.querySelector("[data-lastfm-username]");
+  const status = document.querySelector("[data-lastfm-status]");
+  const top = document.querySelector("[data-lastfm-top]");
+  const loved = document.querySelector("[data-lastfm-loved]");
+  if (!input && !status && !top && !loved) return;
+
+  if (input) input.value = storageGet(storageKeys.lastfmUsername) || "";
+  if (!getLastfmApiKey() && status) {
+    status.innerHTML = "Last.fm can import public listening history after you add a free API key to <strong>lastfmConfig.apiKey</strong> in app.js.";
+  }
+
+  top?.addEventListener("click", () => {
+    importLastfm("user.gettoptracks").catch((error) => {
+      if (status) status.textContent = error.message;
+    });
+  });
+  loved?.addEventListener("click", () => {
+    importLastfm("user.getlovedtracks").catch((error) => {
+      if (status) status.textContent = error.message;
+    });
+  });
+}
+
 function setupSourceChips() {
   const chips = document.querySelectorAll("[data-source]");
   const label = document.querySelector("[data-selected-source]");
   const note = document.querySelector("[data-auth-note]");
+  const saved = storageGet(storageKeys.source);
+  const active = Array.from(chips).find((chip) => chip.dataset.source === saved) || Array.from(chips).find((chip) => chip.classList.contains("active"));
+  if (active) {
+    chips.forEach((item) => item.classList.toggle("active", item === active));
+    if (label) label.textContent = active.dataset.source;
+    storageSet(storageKeys.source, active.dataset.source);
+  }
   chips.forEach((chip) => {
     chip.addEventListener("click", () => {
       chips.forEach((item) => item.classList.toggle("active", item === chip));
       if (label) label.textContent = chip.dataset.source;
       storageSet(storageKeys.source, chip.dataset.source);
-      if (note) note.textContent = chip.dataset.source === "Spotify"
-        ? "Spotify selected. Use the direct import card once your Client ID is configured, or save playlist rows manually."
-        : `${chip.dataset.source} selected. This provider is guidance-only in this static prototype; save playlist rows to continue.`;
+      if (note) {
+        if (chip.dataset.source === "YouTube Music") note.textContent = "YouTube selected. Add a Google OAuth Client ID to activate direct playlist import, or save playlist rows manually.";
+        else if (chip.dataset.source === "Last.fm") note.textContent = "Last.fm selected. Add a free API key and username to import top or loved tracks.";
+        else note.textContent = "Spotify selected. Use this once Spotify Web API access is available, or save playlist rows manually.";
+      }
     });
   });
 }
@@ -1219,6 +1504,8 @@ setupMoodMode();
 setupWeekForm();
 setupImportContext();
 setupSpotifyImport();
+setupYouTubeImport();
+setupLastfmImport();
 setupSourceChips();
 setupIntentButtons();
 setupSignup();
@@ -1228,6 +1515,6 @@ document.querySelector("[data-save-import]")?.addEventListener("click", saveImpo
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=27").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=28").catch(() => {});
   });
 }

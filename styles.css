@@ -1572,6 +1572,7 @@ main {
   margin-top: 16px;
 }
 
+.connect-card,
 .spotify-connect-card {
   display: grid;
   gap: 14px;
@@ -1582,15 +1583,30 @@ main {
   padding: 18px;
 }
 
+.youtube-connect-card {
+  background:
+    radial-gradient(circle at 88% 18%, rgba(255, 107, 53, 0.14), transparent 30%),
+    linear-gradient(180deg, #fff8eb 0%, #fff1d0 100%);
+}
+
+.lastfm-connect-card {
+  background:
+    radial-gradient(circle at 14% 12%, rgba(63, 124, 172, 0.14), transparent 30%),
+    linear-gradient(180deg, #fffaf2 0%, #fff3dc 100%);
+}
+
+.connect-card h3,
 .spotify-connect-card h3 {
   margin-bottom: 6px;
 }
 
+.connect-card p,
 .spotify-connect-card p {
   color: var(--muted);
   line-height: 1.55;
 }
 
+.connect-card .helper-text strong,
 .spotify-connect-card .helper-text strong {
   display: block;
   margin-top: 6px;
@@ -1598,16 +1614,30 @@ main {
   color: #8a4300;
 }
 
+.inline-import-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.inline-import-row input {
+  min-height: 46px;
+}
+
+.provider-playlists,
 .spotify-playlists {
   display: grid;
   gap: 10px;
 }
 
+.provider-playlist-list,
 .spotify-playlist-list {
   display: grid;
   gap: 8px;
 }
 
+.provider-playlist-list button,
 .spotify-playlist-list button {
   display: flex;
   justify-content: space-between;
@@ -1623,10 +1653,12 @@ main {
   padding: 10px 12px;
 }
 
+.provider-playlist-list button:hover,
 .spotify-playlist-list button:hover {
   border-color: var(--orange);
 }
 
+.provider-playlist-list small,
 .spotify-playlist-list small {
   color: var(--muted);
   font-weight: 800;
@@ -1890,6 +1922,7 @@ main {
   .step-launcher,
   .feeling-options,
   .source-picker,
+  .inline-import-row,
   .wizard-options,
   .mode-choice-grid,
   .week-grid {
