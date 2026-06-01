@@ -22,7 +22,7 @@ const spotifyConfig = {
   redirectUri: "https://johnny0103.github.io/moodix/import.html"
 };
 const youtubeConfig = {
-  clientId: "",
+  clientId: "254918547608-dvk9124sjj7ckhnu76gnjhte9chea1o3.apps.googleusercontent.com",
   scopes: "https://www.googleapis.com/auth/youtube.readonly"
 };
 const lastfmConfig = {
@@ -1515,6 +1515,6 @@ document.querySelector("[data-save-import]")?.addEventListener("click", saveImpo
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=28").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=29").catch(() => {});
   });
 }

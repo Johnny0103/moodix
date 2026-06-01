@@ -1,4 +1,4 @@
-const CACHE_NAME = "moodix-v28";
+const CACHE_NAME = "moodix-v29";
 const ASSETS = [
   "./",
   "index.html",
@@ -8,8 +8,8 @@ const ASSETS = [
   "app-version.html",
   "refresh.html",
   "signup.html",
-  "styles.css?v=28",
-  "app.js?v=28",
+  "styles.css?v=29",
+  "app.js?v=29",
   "manifest.webmanifest",
   "assets/moodix-hero.png",
   "assets/icon.svg",
