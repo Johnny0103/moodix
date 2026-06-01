@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Manrope:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=30">
+    <link rel="stylesheet" href="styles.css?v=31">
   </head>
   <body data-requires-signin>
     <header class="site-header">
@@ -81,8 +81,8 @@
         <form class="question-card mood-wizard" data-day-form data-mode-panel="today" hidden>
           <div class="wizard-question" data-wizard-question></div>
           <div class="wizard-actions">
+            <button class="button secondary dark" type="button" data-wizard-back>Back</button>
             <button class="button secondary dark" type="button" data-wizard-skip>Prefer not to answer</button>
-            <button class="button primary" type="button" data-wizard-next>Next</button>
           </div>
           <div class="wizard-progress" aria-live="polite">
             <div class="wizard-progress-top">
@@ -98,8 +98,8 @@
         <form class="question-card mood-wizard" data-week-form data-mode-panel="week" hidden>
           <div class="wizard-question" data-week-wizard-question></div>
           <div class="wizard-actions">
+            <button class="button secondary dark" type="button" data-week-wizard-back>Back</button>
             <button class="button secondary dark" type="button" data-week-wizard-skip>Prefer not to answer</button>
-            <button class="button primary" type="button" data-week-wizard-next>Next</button>
           </div>
           <div class="wizard-progress" aria-live="polite">
             <div class="wizard-progress-top">
@@ -131,6 +131,6 @@
       </section>
     </main>
 
-    <script src="app.js?v=30" defer></script>
+    <script src="app.js?v=31" defer></script>
   </body>
 </html>

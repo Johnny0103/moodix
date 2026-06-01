@@ -496,8 +496,8 @@ function setupDayForm() {
   const percent = document.querySelector("[data-wizard-percent]");
   const left = document.querySelector("[data-wizard-left]");
   const bar = document.querySelector("[data-wizard-bar]");
-  const next = document.querySelector("[data-wizard-next]");
   const skip = document.querySelector("[data-wizard-skip]");
+  const back = document.querySelector("[data-wizard-back]");
   if (!form || !card) return;
 
   if (!questionTarget) {
@@ -518,6 +518,7 @@ function setupDayForm() {
   const answers = {};
   let selectedAnswer = "";
   let step = 0;
+  let advanceTimer = 0;
 
   const saveAnalysis = () => {
     const synthetic = new FormData();
@@ -542,6 +543,7 @@ function setupDayForm() {
       left.textContent = remaining === 1 ? "1 question left" : `${remaining} questions left`;
     }
     if (bar) bar.style.width = `${completion}%`;
+    if (back) back.disabled = step === 0;
   };
 
   const renderStep = () => {
@@ -551,19 +553,19 @@ function setupDayForm() {
       saveAnalysis();
       return;
     }
+    selectedAnswer = answers[question.name] || "";
     questionTarget.innerHTML = `
       <p class="eyebrow">Question ${step + 1} of ${moodQuestions.length}</p>
       <h2>${question.question}</h2>
       <div class="wizard-options">
         ${question.options.map(([value, label, hint]) => `
-          <button class="wizard-option" type="button" data-answer="${escapeHTML(value)}">
+          <button class="wizard-option${selectedAnswer === value ? " selected" : ""}" type="button" data-answer="${escapeHTML(value)}">
             <strong>${escapeHTML(label)}</strong>
             <small>${escapeHTML(hint)}</small>
           </button>
         `).join("")}
       </div>
     `;
-    selectedAnswer = "";
     updateProgress();
   };
 
@@ -574,6 +576,8 @@ function setupDayForm() {
     questionTarget.querySelectorAll("[data-answer]").forEach((button) => {
       button.classList.toggle("selected", button === option);
     });
+    window.clearTimeout(advanceTimer);
+    advanceTimer = window.setTimeout(() => advance(false), 220);
   });
 
   const advance = (preferNot = false) => {
@@ -584,8 +588,14 @@ function setupDayForm() {
     renderStep();
   };
 
-  next?.addEventListener("click", () => advance(false));
   skip?.addEventListener("click", () => advance(true));
+  back?.addEventListener("click", () => {
+    window.clearTimeout(advanceTimer);
+    if (step === 0) return;
+    step -= 1;
+    selectedAnswer = answers[moodQuestions[step]?.name] || "";
+    renderStep();
+  });
 
   form.addEventListener("submit", (event) => event.preventDefault());
   renderStep();
@@ -652,8 +662,8 @@ function setupWeekForm() {
   const percent = document.querySelector("[data-week-wizard-percent]");
   const left = document.querySelector("[data-week-wizard-left]");
   const bar = document.querySelector("[data-week-wizard-bar]");
-  const next = document.querySelector("[data-week-wizard-next]");
   const skip = document.querySelector("[data-week-wizard-skip]");
+  const back = document.querySelector("[data-week-wizard-back]");
   const summary = document.querySelector("[data-week-summary]");
   if (!form || !questionTarget) return;
 
@@ -668,6 +678,7 @@ function setupWeekForm() {
   ];
   let selectedAnswer = "";
   let step = 0;
+  let advanceTimer = 0;
 
   const updateProgress = () => {
     const completed = Math.min(step, days.length);
@@ -678,6 +689,7 @@ function setupWeekForm() {
       left.textContent = remaining === 1 ? "1 day left" : `${remaining} days left`;
     }
     if (bar) bar.style.width = `${completion}%`;
+    if (back) back.disabled = step === 0;
   };
 
   const saveWeek = () => {
@@ -719,19 +731,19 @@ function setupWeekForm() {
       saveWeek();
       return;
     }
+    selectedAnswer = answers[step] || "";
     questionTarget.innerHTML = `
       <p class="eyebrow">Day ${step + 1} of ${days.length}</p>
       <h2>What mood do you predict for ${day.weekday}?</h2>
       <div class="wizard-options">
         ${weekOptions.map(([value, label, hint]) => `
-          <button class="wizard-option" type="button" data-week-answer="${escapeHTML(value)}">
+          <button class="wizard-option${selectedAnswer === value ? " selected" : ""}" type="button" data-week-answer="${escapeHTML(value)}">
             <strong>${escapeHTML(label)}</strong>
             <small>${escapeHTML(hint)}</small>
           </button>
         `).join("")}
       </div>
     `;
-    selectedAnswer = "";
     updateProgress();
   };
 
@@ -742,6 +754,8 @@ function setupWeekForm() {
     questionTarget.querySelectorAll("[data-week-answer]").forEach((button) => {
       button.classList.toggle("selected", button === option);
     });
+    window.clearTimeout(advanceTimer);
+    advanceTimer = window.setTimeout(() => advance(false), 220);
   });
 
   const advance = (preferNot = false) => {
@@ -750,8 +764,14 @@ function setupWeekForm() {
     renderStep();
   };
 
-  next?.addEventListener("click", () => advance(false));
   skip?.addEventListener("click", () => advance(true));
+  back?.addEventListener("click", () => {
+    window.clearTimeout(advanceTimer);
+    if (step === 0) return;
+    step -= 1;
+    selectedAnswer = answers[step] || "";
+    renderStep();
+  });
   form.addEventListener("submit", (event) => event.preventDefault());
   renderStep();
 }
@@ -1515,6 +1535,6 @@ document.querySelector("[data-save-import]")?.addEventListener("click", saveImpo
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=30").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=31").catch(() => {});
   });
 }
