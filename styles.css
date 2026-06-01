@@ -193,6 +193,29 @@ a {
   color: var(--text);
 }
 
+.audio-toggle {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 70;
+  min-height: 42px;
+  border: 1px solid rgba(255, 209, 102, 0.42);
+  border-radius: 999px;
+  background: rgba(32, 21, 15, 0.82);
+  color: var(--ink);
+  box-shadow: 0 18px 50px rgba(32, 21, 15, 0.24);
+  cursor: pointer;
+  font-size: 0.84rem;
+  font-weight: 900;
+  padding: 0 14px;
+  backdrop-filter: blur(16px);
+}
+
+.audio-toggle[data-audio-state="off"] {
+  border-color: rgba(255, 255, 255, 0.16);
+  color: rgba(255, 250, 240, 0.62);
+}
+
 .hero {
   position: relative;
   display: flex;

@@ -16,6 +16,72 @@ const storageKeys = {
 };
 
 const memoryStorage = {};
+const audioProfiles = {
+  Ambient: {
+    tempo: 84,
+    wave: "sine",
+    volume: 0.032,
+    melody: [329.63, 392.0, 493.88, 440.0],
+    bass: [164.81, 196.0],
+    chime: [659.25, 783.99]
+  },
+  Focused: {
+    tempo: 76,
+    wave: "triangle",
+    volume: 0.038,
+    melody: [261.63, 329.63, 392.0, 493.88],
+    bass: [130.81, 164.81],
+    chime: [523.25, 659.25]
+  },
+  Restorative: {
+    tempo: 58,
+    wave: "sine",
+    volume: 0.03,
+    melody: [293.66, 349.23, 440.0, 523.25],
+    bass: [146.83, 174.61],
+    chime: [587.33, 698.46]
+  },
+  Bright: {
+    tempo: 104,
+    wave: "triangle",
+    volume: 0.04,
+    melody: [329.63, 392.0, 493.88, 587.33],
+    bass: [164.81, 196.0],
+    chime: [659.25, 783.99]
+  },
+  Tender: {
+    tempo: 66,
+    wave: "sine",
+    volume: 0.034,
+    melody: [220.0, 277.18, 329.63, 415.3],
+    bass: [110.0, 138.59],
+    chime: [440.0, 554.37]
+  },
+  Electric: {
+    tempo: 122,
+    wave: "sawtooth",
+    volume: 0.036,
+    melody: [293.66, 369.99, 440.0, 587.33],
+    bass: [146.83, 185.0],
+    chime: [739.99, 880.0]
+  },
+  Grounded: {
+    tempo: 72,
+    wave: "triangle",
+    volume: 0.036,
+    melody: [196.0, 246.94, 293.66, 392.0],
+    bass: [98.0, 123.47],
+    chime: [392.0, 493.88]
+  },
+  Reflective: {
+    tempo: 68,
+    wave: "sine",
+    volume: 0.034,
+    melody: [246.94, 311.13, 369.99, 493.88],
+    bass: [123.47, 155.56],
+    chime: [493.88, 622.25]
+  }
+};
 const spotifyConfig = {
   clientId: "",
   scopes: ["playlist-read-private", "playlist-read-collaborative"],
@@ -144,6 +210,124 @@ function storageRemove(key) {
     // Memory fallback keeps the current prototype session usable.
   }
 }
+
+const moodixAudio = (() => {
+  let context = null;
+  let master = null;
+  let filter = null;
+  let timer = 0;
+  let step = 0;
+  let mood = "Ambient";
+  let unlocked = false;
+  let muted = false;
+
+  const getProfile = () => audioProfiles[mood] || audioProfiles.Ambient;
+
+  const ensureContext = () => {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return null;
+    if (!context) {
+      context = new AudioContext();
+      master = context.createGain();
+      filter = context.createBiquadFilter();
+      filter.type = "lowpass";
+      filter.frequency.value = 2200;
+      master.gain.value = 0;
+      filter.connect(master);
+      master.connect(context.destination);
+    }
+    return context;
+  };
+
+  const fadeMaster = (target, seconds = 0.8) => {
+    if (!context || !master) return;
+    master.gain.cancelScheduledValues(context.currentTime);
+    master.gain.setTargetAtTime(target, context.currentTime, seconds / 4);
+  };
+
+  const playTone = (frequency, when, duration, type, gainValue) => {
+    if (!context || !filter) return;
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    oscillator.type = type;
+    oscillator.frequency.setValueAtTime(frequency, when);
+    gain.gain.setValueAtTime(0.0001, when);
+    gain.gain.exponentialRampToValueAtTime(Math.max(gainValue, 0.0002), when + 0.04);
+    gain.gain.exponentialRampToValueAtTime(0.0001, when + duration);
+    oscillator.connect(gain);
+    gain.connect(filter);
+    oscillator.start(when);
+    oscillator.stop(when + duration + 0.06);
+  };
+
+  const scheduleLoop = () => {
+    if (!context || muted) return;
+    const profile = getProfile();
+    const beat = 60 / profile.tempo;
+    const now = context.currentTime + 0.05;
+    const melody = profile.melody[step % profile.melody.length];
+    const bass = profile.bass[Math.floor(step / 4) % profile.bass.length];
+
+    playTone(melody, now, beat * 1.7, profile.wave, profile.volume);
+    if (step % 4 === 0) playTone(bass, now, beat * 3.6, "sine", profile.volume * 0.9);
+    if (step % 8 === 6) {
+      profile.chime.forEach((frequency, index) => {
+        playTone(frequency, now + index * 0.08, beat * 1.1, "sine", profile.volume * 0.45);
+      });
+    }
+    step = (step + 1) % 16;
+  };
+
+  const start = async (nextMood = mood) => {
+    mood = audioProfiles[nextMood] ? nextMood : "Ambient";
+    if (muted) return;
+    const ctx = ensureContext();
+    if (!ctx) return;
+    if (ctx.state === "suspended") await ctx.resume();
+    unlocked = true;
+    window.clearInterval(timer);
+    step = 0;
+    scheduleLoop();
+    timer = window.setInterval(scheduleLoop, (60 / getProfile().tempo) * 1000);
+    fadeMaster(getProfile().volume, 1.2);
+    updateAudioToggle();
+  };
+
+  const stop = () => {
+    muted = true;
+    window.clearInterval(timer);
+    fadeMaster(0, 0.5);
+    updateAudioToggle();
+  };
+
+  const setMood = (nextMood) => {
+    mood = audioProfiles[nextMood] ? nextMood : "Ambient";
+    if (unlocked && !muted) start(mood);
+  };
+
+  const playTransition = async () => {
+    muted = false;
+    await start("Bright");
+    if (!context) return;
+    const now = context.currentTime;
+    [392, 493.88, 659.25, 783.99, 987.77].forEach((frequency, index) => {
+      playTone(frequency, now + index * 0.18, 0.38, "triangle", 0.065);
+    });
+    window.setTimeout(() => setMood(getStoredAnalysis()?.word || "Ambient"), 3000);
+  };
+
+  const toggle = async () => {
+    if (muted || !unlocked) {
+      muted = false;
+      await start(mood);
+    } else {
+      stop();
+    }
+  };
+
+  const state = () => ({ muted, unlocked, mood });
+  return { start, stop, setMood, playTransition, toggle, state };
+})();
 
 const logoMarks = {
   pulse: `
@@ -278,6 +462,39 @@ function setupLocalTime() {
   document.querySelectorAll("[data-local-time]").forEach((item) => item.textContent = `${meta.time} local time`);
 }
 
+function updateAudioToggle() {
+  const button = document.querySelector("[data-audio-toggle]");
+  if (!button) return;
+  const state = moodixAudio.state();
+  button.textContent = !state.unlocked ? "Start sound" : state.muted ? "Sound off" : "Sound on";
+  button.setAttribute("aria-pressed", String(!state.muted));
+  button.dataset.audioState = state.muted ? "off" : "on";
+}
+
+function setupSiteAudio() {
+  if (!document.body || document.querySelector("[data-audio-toggle]")) return;
+  const button = document.createElement("button");
+  button.className = "audio-toggle";
+  button.type = "button";
+  button.dataset.audioToggle = "true";
+  button.setAttribute("aria-label", "Toggle Moodix background music");
+  document.body.append(button);
+  updateAudioToggle();
+
+  button.addEventListener("click", () => {
+    moodixAudio.toggle();
+  });
+
+  const unlock = (event) => {
+    if (event.target?.closest?.("[data-audio-toggle]")) return;
+    const word = getStoredAnalysis()?.word || document.querySelector("[data-result-word]")?.textContent?.trim() || "Ambient";
+    moodixAudio.start(word);
+  };
+  window.addEventListener("pointerdown", unlock, { once: true });
+  window.addEventListener("keydown", unlock, { once: true });
+  window.addEventListener("wheel", unlock, { once: true });
+}
+
 function getUser() {
   return getJSON(storageKeys.user);
 }
@@ -320,6 +537,7 @@ function setupSignin() {
       overlay.hidden = false;
       overlay.classList.add("active");
       document.body.classList.add("show-emotion-overlay");
+      moodixAudio.playTransition();
       window.setTimeout(() => {
         window.location.href = "mood-check.html?intro=1";
       }, 3000);
@@ -509,6 +727,7 @@ function setupDayForm() {
       document.querySelector("[data-day-word]").textContent = analysis.word;
       document.querySelector("[data-day-summary]").textContent = `${analysis.weekday} reads as ${analysis.word.toLowerCase()}. Moodix saved this for ${analysis.date}.`;
       document.querySelector("[data-analysis-detail]").textContent = analysis.detail;
+      moodixAudio.setMood(analysis.word);
       card.hidden = false;
       card.scrollIntoView({ behavior: "smooth", block: "center" });
     });
@@ -529,6 +748,7 @@ function setupDayForm() {
     document.querySelector("[data-day-word]").textContent = analysis.word;
     document.querySelector("[data-day-summary]").textContent = `${analysis.weekday} reads as ${analysis.word.toLowerCase()}. Moodix saved this for ${analysis.date}.`;
     document.querySelector("[data-analysis-detail]").textContent = analysis.detail;
+    moodixAudio.setMood(analysis.word);
     card.hidden = false;
     form.hidden = true;
     card.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -712,6 +932,7 @@ function setupWeekForm() {
     });
     storageSet(storageKeys.checkMode, "week");
     if (analyzedDays[0]?.analysis) setJSON(storageKeys.analysis, analyzedDays[0].analysis);
+    if (analyzedDays[0]?.analysis?.word) moodixAudio.setMood(analyzedDays[0].analysis.word);
     setJSON(storageKeys.weekAnalysis, {
       createdAt: new Date().toISOString(),
       weekOf: analyzedDays[0]?.stamp,
@@ -1425,6 +1646,7 @@ function setupResultPage() {
   const tracks = getJSON(storageKeys.tracks, demoSongs);
   word.textContent = analysis.word;
   summary.textContent = analysis.detail || `${analysis.weekday} reads as ${analysis.word.toLowerCase()}.`;
+  moodixAudio.setMood(analysis.word);
   reveal.addEventListener("click", () => {
     renderTopFive(rankSongs(tracks, analysis), analysis);
     reveal.hidden = true;
@@ -1515,6 +1737,7 @@ function setupScrollBoost() {
 
 setupLogoPicker();
 setupLocalTime();
+setupSiteAudio();
 setupSignin();
 requireSignin();
 setupScrollBoost();
@@ -1535,6 +1758,6 @@ document.querySelector("[data-save-import]")?.addEventListener("click", saveImpo
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=31").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=32").catch(() => {});
   });
 }
