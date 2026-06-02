@@ -20,7 +20,7 @@ const audioProfiles = {
   Ambient: {
     tempo: 84,
     wave: "sine",
-    volume: 0.032,
+    volume: 0.042,
     melody: [329.63, 392.0, 493.88, 440.0],
     bass: [164.81, 196.0],
     chime: [659.25, 783.99]
@@ -28,7 +28,7 @@ const audioProfiles = {
   Focused: {
     tempo: 76,
     wave: "triangle",
-    volume: 0.038,
+    volume: 0.049,
     melody: [261.63, 329.63, 392.0, 493.88],
     bass: [130.81, 164.81],
     chime: [523.25, 659.25]
@@ -36,7 +36,7 @@ const audioProfiles = {
   Restorative: {
     tempo: 58,
     wave: "sine",
-    volume: 0.03,
+    volume: 0.039,
     melody: [293.66, 349.23, 440.0, 523.25],
     bass: [146.83, 174.61],
     chime: [587.33, 698.46]
@@ -44,7 +44,7 @@ const audioProfiles = {
   Bright: {
     tempo: 104,
     wave: "triangle",
-    volume: 0.04,
+    volume: 0.052,
     melody: [329.63, 392.0, 493.88, 587.33],
     bass: [164.81, 196.0],
     chime: [659.25, 783.99]
@@ -52,7 +52,7 @@ const audioProfiles = {
   Tender: {
     tempo: 66,
     wave: "sine",
-    volume: 0.034,
+    volume: 0.044,
     melody: [220.0, 277.18, 329.63, 415.3],
     bass: [110.0, 138.59],
     chime: [440.0, 554.37]
@@ -60,7 +60,7 @@ const audioProfiles = {
   Electric: {
     tempo: 122,
     wave: "sawtooth",
-    volume: 0.036,
+    volume: 0.047,
     melody: [293.66, 369.99, 440.0, 587.33],
     bass: [146.83, 185.0],
     chime: [739.99, 880.0]
@@ -68,7 +68,7 @@ const audioProfiles = {
   Grounded: {
     tempo: 72,
     wave: "triangle",
-    volume: 0.036,
+    volume: 0.047,
     melody: [196.0, 246.94, 293.66, 392.0],
     bass: [98.0, 123.47],
     chime: [392.0, 493.88]
@@ -76,7 +76,7 @@ const audioProfiles = {
   Reflective: {
     tempo: 68,
     wave: "sine",
-    volume: 0.034,
+    volume: 0.044,
     melody: [246.94, 311.13, 369.99, 493.88],
     bass: [123.47, 155.56],
     chime: [493.88, 622.25]
@@ -1758,6 +1758,6 @@ document.querySelector("[data-save-import]")?.addEventListener("click", saveImpo
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=33").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=34").catch(() => {});
   });
 }
