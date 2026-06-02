@@ -214,6 +214,7 @@ function storageRemove(key) {
 const moodixAudio = (() => {
   let context = null;
   let master = null;
+  let sfx = null;
   let filter = null;
   let timer = 0;
   let step = 0;
@@ -230,12 +231,15 @@ const moodixAudio = (() => {
     if (!context) {
       context = new AudioContext();
       master = context.createGain();
+      sfx = context.createGain();
       filter = context.createBiquadFilter();
       filter.type = "lowpass";
       filter.frequency.value = 2200;
       master.gain.value = 0;
+      sfx.gain.value = 0.23;
       filter.connect(master);
       master.connect(context.destination);
+      sfx.connect(context.destination);
     }
     return context;
   };
@@ -259,6 +263,42 @@ const moodixAudio = (() => {
     gain.connect(filter);
     oscillator.start(when);
     oscillator.stop(when + duration + 0.06);
+  };
+
+  const playPress = async () => {
+    const ctx = ensureContext();
+    if (!ctx || !sfx) return;
+    if (ctx.state === "suspended") {
+      await ctx.resume().catch(() => {});
+    }
+    const now = ctx.currentTime;
+    const click = ctx.createOscillator();
+    const clickGain = ctx.createGain();
+    const pop = ctx.createOscillator();
+    const popGain = ctx.createGain();
+
+    click.type = "triangle";
+    click.frequency.setValueAtTime(780, now);
+    click.frequency.exponentialRampToValueAtTime(420, now + 0.055);
+    clickGain.gain.setValueAtTime(0.0001, now);
+    clickGain.gain.exponentialRampToValueAtTime(0.105, now + 0.008);
+    clickGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.075);
+
+    pop.type = "sine";
+    pop.frequency.setValueAtTime(190, now);
+    pop.frequency.exponentialRampToValueAtTime(145, now + 0.08);
+    popGain.gain.setValueAtTime(0.0001, now);
+    popGain.gain.exponentialRampToValueAtTime(0.05, now + 0.012);
+    popGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
+
+    click.connect(clickGain);
+    pop.connect(popGain);
+    clickGain.connect(sfx);
+    popGain.connect(sfx);
+    click.start(now);
+    pop.start(now);
+    click.stop(now + 0.095);
+    pop.stop(now + 0.11);
   };
 
   const scheduleLoop = () => {
@@ -331,7 +371,7 @@ const moodixAudio = (() => {
   };
 
   const state = () => ({ muted, unlocked, mood, stoppedByUser });
-  return { start, stop, setMood, playTransition, toggle, state };
+  return { start, stop, setMood, playTransition, playPress, toggle, state };
 })();
 
 const logoMarks = {
@@ -483,6 +523,8 @@ function setupPressEffects() {
   document.addEventListener("pointerdown", (event) => {
     const target = event.target.closest?.(selector);
     if (!target || target.disabled || target.getAttribute("aria-disabled") === "true") return;
+
+    moodixAudio.playPress().catch(() => {});
 
     const rect = target.getBoundingClientRect();
     const ripple = document.createElement("span");
@@ -1803,6 +1845,6 @@ document.querySelector("[data-save-import]")?.addEventListener("click", saveImpo
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=37").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=38").catch(() => {});
   });
 }
