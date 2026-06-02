@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=38">
+    <link rel="stylesheet" href="styles.css?v=39">
   </head>
   <body data-requires-signin>
     <header class="site-header">
@@ -53,12 +53,12 @@
         <div class="section-heading compact">
           <p class="eyebrow">Music authorization</p>
           <h2>Choose a direct path, then keep manual upload as backup.</h2>
-          <p>YouTube and Last.fm are the most realistic low-cost imports right now. Spotify and Apple stay ready for later platform access.</p>
+          <p>YouTube is the direct account connection. Last.fm is the fastest low-cost fallback: users type a Last.fm username and Moodix pulls public listening history.</p>
         </div>
 
         <div class="source-picker" aria-label="Prototype music source options">
           <button class="source-card active" type="button" data-source="YouTube Music"><span>YouTube / YouTube Music</span><small>Direct Google playlist import</small></button>
-          <button class="source-card" type="button" data-source="Last.fm"><span>Last.fm</span><small>Import top or loved tracks</small></button>
+          <button class="source-card" type="button" data-source="Last.fm"><span>Last.fm</span><small>Import recent, top, or loved tracks</small></button>
           <button class="source-card" type="button" data-source="Spotify"><span>Spotify</span><small>Ready when Web API unlocks</small></button>
         </div>
 
@@ -82,11 +82,18 @@
               <div>
                 <p class="eyebrow">No playlist permission needed</p>
                 <h3>Import Last.fm history.</h3>
-                <p data-lastfm-status>Enter a Last.fm username to import public top tracks or loved tracks once an API key is configured.</p>
+                <p data-lastfm-status>Enter a Last.fm username to import public recent, top, or loved tracks once an API key is configured.</p>
               </div>
+              <label for="lastfm-api-key">Developer API key</label>
+              <div class="inline-import-row setup-row">
+                <input id="lastfm-api-key" type="text" placeholder="Paste your Last.fm API key for testing" data-lastfm-api-key>
+                <button class="button secondary dark" type="button" data-lastfm-save-key>Save key</button>
+              </div>
+              <p class="helper-text">For launch, add this key once in <strong>lastfmConfig.apiKey</strong>. Users should only need their username.</p>
               <label for="lastfm-username">Last.fm username</label>
-              <div class="inline-import-row">
+              <div class="inline-import-row lastfm-action-row">
                 <input id="lastfm-username" type="text" placeholder="yourusername" data-lastfm-username>
+                <button class="button secondary dark" type="button" data-lastfm-recent>Recent tracks</button>
                 <button class="button secondary dark" type="button" data-lastfm-top>Top tracks</button>
                 <button class="button secondary dark" type="button" data-lastfm-loved>Loved tracks</button>
               </div>
@@ -122,7 +129,7 @@ Intro, The xx, focused, medium, indie electronic, work</textarea>
           <section class="auth-panel" aria-labelledby="auth-title">
             <p class="eyebrow">Connection status</p>
             <h2 id="auth-title">Start with YouTube, then Last.fm.</h2>
-            <p data-auth-note>YouTube uses Google OAuth in the browser. Last.fm can import public listening history with a free API key. CSV and paste remain the safest fallback.</p>
+            <p data-auth-note>YouTube uses Google OAuth in the browser. Last.fm uses one free developer API key plus a user’s public username. CSV and paste remain the safest fallback.</p>
             <div class="auth-steps">
               <strong>To authorize YouTube / YouTube Music</strong>
               <ol>
@@ -134,9 +141,11 @@ Intro, The xx, focused, medium, indie electronic, work</textarea>
               </ol>
               <strong>To authorize Last.fm</strong>
               <ol>
-                <li>Create a free Last.fm API account.</li>
-                <li>Copy the API key into the Moodix Last.fm config.</li>
-                <li>Users can import from public usernames without typing full playlists.</li>
+                <li>Go to <a href="https://www.last.fm/api/account/create" target="_blank" rel="noreferrer">last.fm/api/account/create</a>.</li>
+                <li>Create an API account and copy the API key, not the shared secret.</li>
+                <li>Paste it in the Developer API key field above for testing.</li>
+                <li>For launch, add it to <code>lastfmConfig.apiKey</code> in <code>app.js</code>.</li>
+                <li>Users can then import by entering only their public Last.fm username.</li>
               </ol>
               <strong>Spotify later</strong>
               <ol>
@@ -155,6 +164,6 @@ Intro, The xx, focused, medium, indie electronic, work</textarea>
     </main>
 
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script src="app.js?v=38" defer></script>
+    <script src="app.js?v=39" defer></script>
   </body>
 </html>

@@ -1721,6 +1721,14 @@ main {
   align-items: center;
 }
 
+.setup-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.lastfm-action-row {
+  grid-template-columns: minmax(0, 1fr) repeat(3, auto);
+}
+
 .inline-import-row input {
   min-height: 46px;
 }

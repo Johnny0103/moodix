@@ -12,7 +12,8 @@ const storageKeys = {
   spotifyVerifier: "moodix_spotify_verifier",
   spotifyState: "moodix_spotify_state",
   youtubeToken: "moodix_youtube_token",
-  lastfmUsername: "moodix_lastfm_username"
+  lastfmUsername: "moodix_lastfm_username",
+  lastfmApiKey: "moodix_lastfm_api_key"
 };
 
 const memoryStorage = {};
@@ -1515,12 +1516,12 @@ function setupYouTubeImport() {
 }
 
 function getLastfmApiKey() {
-  return window.MOODIX_LASTFM_API_KEY || lastfmConfig.apiKey;
+  return window.MOODIX_LASTFM_API_KEY || lastfmConfig.apiKey || storageGet(storageKeys.lastfmApiKey);
 }
 
 async function lastfmFetch(method, username) {
   const apiKey = getLastfmApiKey();
-  if (!apiKey) throw new Error("Add a free Last.fm API key to lastfmConfig.apiKey before importing.");
+  if (!apiKey) throw new Error("Add a free Last.fm API key first. Paste it on this page for testing, or add it to lastfmConfig.apiKey before launch.");
   const params = new URLSearchParams({
     method,
     user: username,
@@ -1591,7 +1592,11 @@ async function importLastfm(method) {
   storageSet(storageKeys.lastfmUsername, username);
   if (status) status.textContent = "Importing Last.fm tracks...";
   const data = await lastfmFetch(method, username);
-  const list = method === "user.getlovedtracks" ? data.lovedtracks?.track : data.toptracks?.track;
+  const list = method === "user.getlovedtracks"
+    ? data.lovedtracks?.track
+    : method === "user.getrecenttracks"
+      ? data.recenttracks?.track
+      : data.toptracks?.track;
   const tracks = normalizeImportedTracks((list || []).map(lastfmTrackToSong));
   setJSON(storageKeys.tracks, tracks.length ? tracks : demoSongs);
   storageSet(storageKeys.source, "Last.fm");
@@ -1605,13 +1610,33 @@ function setupLastfmImport() {
   const status = document.querySelector("[data-lastfm-status]");
   const top = document.querySelector("[data-lastfm-top]");
   const loved = document.querySelector("[data-lastfm-loved]");
-  if (!input && !status && !top && !loved) return;
+  const recent = document.querySelector("[data-lastfm-recent]");
+  const apiKeyInput = document.querySelector("[data-lastfm-api-key]");
+  const saveKey = document.querySelector("[data-lastfm-save-key]");
+  if (!input && !status && !top && !loved && !recent && !apiKeyInput && !saveKey) return;
 
   if (input) input.value = storageGet(storageKeys.lastfmUsername) || "";
+  if (apiKeyInput) apiKeyInput.value = storageGet(storageKeys.lastfmApiKey) || "";
   if (!getLastfmApiKey() && status) {
-    status.innerHTML = "Last.fm can import public listening history after you add a free API key to <strong>lastfmConfig.apiKey</strong> in app.js.";
+    status.innerHTML = "Last.fm can import public listening history after you add a free API key. Paste it below for testing, or put it in <strong>lastfmConfig.apiKey</strong> in app.js before launch.";
+  } else if (status) {
+    status.textContent = "Last.fm is ready. Enter a public Last.fm username and choose Recent, Top, or Loved tracks.";
   }
 
+  saveKey?.addEventListener("click", () => {
+    const key = apiKeyInput?.value.trim();
+    if (!key) {
+      if (status) status.textContent = "Paste your Last.fm API key first.";
+      return;
+    }
+    storageSet(storageKeys.lastfmApiKey, key);
+    if (status) status.textContent = "Last.fm API key saved locally for this browser. Now enter a username and import.";
+  });
+  recent?.addEventListener("click", () => {
+    importLastfm("user.getrecenttracks").catch((error) => {
+      if (status) status.textContent = error.message;
+    });
+  });
   top?.addEventListener("click", () => {
     importLastfm("user.gettoptracks").catch((error) => {
       if (status) status.textContent = error.message;
@@ -1642,7 +1667,7 @@ function setupSourceChips() {
       storageSet(storageKeys.source, chip.dataset.source);
       if (note) {
         if (chip.dataset.source === "YouTube Music") note.textContent = "YouTube selected. Add a Google OAuth Client ID to activate direct playlist import, or save playlist rows manually.";
-        else if (chip.dataset.source === "Last.fm") note.textContent = "Last.fm selected. Add a free API key and username to import top or loved tracks.";
+        else if (chip.dataset.source === "Last.fm") note.textContent = "Last.fm selected. Add a free API key and username to import recent, top, or loved tracks.";
         else note.textContent = "Spotify selected. Use this once Spotify Web API access is available, or save playlist rows manually.";
       }
     });
@@ -1845,6 +1870,6 @@ document.querySelector("[data-save-import]")?.addEventListener("click", saveImpo
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=38").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=39").catch(() => {});
   });
 }
