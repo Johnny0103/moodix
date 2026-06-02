@@ -20,7 +20,7 @@ const audioProfiles = {
   Ambient: {
     tempo: 84,
     wave: "sine",
-    volume: 0.042,
+    volume: 0.064,
     melody: [329.63, 392.0, 493.88, 440.0],
     bass: [164.81, 196.0],
     chime: [659.25, 783.99]
@@ -28,7 +28,7 @@ const audioProfiles = {
   Focused: {
     tempo: 76,
     wave: "triangle",
-    volume: 0.049,
+    volume: 0.074,
     melody: [261.63, 329.63, 392.0, 493.88],
     bass: [130.81, 164.81],
     chime: [523.25, 659.25]
@@ -36,7 +36,7 @@ const audioProfiles = {
   Restorative: {
     tempo: 58,
     wave: "sine",
-    volume: 0.039,
+    volume: 0.059,
     melody: [293.66, 349.23, 440.0, 523.25],
     bass: [146.83, 174.61],
     chime: [587.33, 698.46]
@@ -44,7 +44,7 @@ const audioProfiles = {
   Bright: {
     tempo: 104,
     wave: "triangle",
-    volume: 0.052,
+    volume: 0.078,
     melody: [329.63, 392.0, 493.88, 587.33],
     bass: [164.81, 196.0],
     chime: [659.25, 783.99]
@@ -52,7 +52,7 @@ const audioProfiles = {
   Tender: {
     tempo: 66,
     wave: "sine",
-    volume: 0.044,
+    volume: 0.066,
     melody: [220.0, 277.18, 329.63, 415.3],
     bass: [110.0, 138.59],
     chime: [440.0, 554.37]
@@ -60,7 +60,7 @@ const audioProfiles = {
   Electric: {
     tempo: 122,
     wave: "sawtooth",
-    volume: 0.047,
+    volume: 0.071,
     melody: [293.66, 369.99, 440.0, 587.33],
     bass: [146.83, 185.0],
     chime: [739.99, 880.0]
@@ -68,7 +68,7 @@ const audioProfiles = {
   Grounded: {
     tempo: 72,
     wave: "triangle",
-    volume: 0.047,
+    volume: 0.071,
     melody: [196.0, 246.94, 293.66, 392.0],
     bass: [98.0, 123.47],
     chime: [392.0, 493.88]
@@ -76,7 +76,7 @@ const audioProfiles = {
   Reflective: {
     tempo: 68,
     wave: "sine",
-    volume: 0.044,
+    volume: 0.066,
     melody: [246.94, 311.13, 369.99, 493.88],
     bass: [123.47, 155.56],
     chime: [493.88, 622.25]
@@ -220,6 +220,7 @@ const moodixAudio = (() => {
   let mood = "Ambient";
   let unlocked = false;
   let muted = false;
+  let stoppedByUser = false;
 
   const getProfile = () => audioProfiles[mood] || audioProfiles.Ambient;
 
@@ -280,6 +281,7 @@ const moodixAudio = (() => {
 
   const start = async (nextMood = mood) => {
     mood = audioProfiles[nextMood] ? nextMood : "Ambient";
+    if (stoppedByUser) return;
     if (muted) return;
     const ctx = ensureContext();
     if (!ctx) return;
@@ -295,6 +297,7 @@ const moodixAudio = (() => {
 
   const stop = () => {
     muted = true;
+    stoppedByUser = true;
     window.clearInterval(timer);
     fadeMaster(0, 0.5);
     updateAudioToggle();
@@ -306,6 +309,7 @@ const moodixAudio = (() => {
   };
 
   const playTransition = async () => {
+    if (stoppedByUser) return;
     muted = false;
     await start("Bright");
     if (!context) return;
@@ -318,6 +322,7 @@ const moodixAudio = (() => {
 
   const toggle = async () => {
     if (muted || !unlocked) {
+      stoppedByUser = false;
       muted = false;
       await start(mood);
     } else {
@@ -325,7 +330,7 @@ const moodixAudio = (() => {
     }
   };
 
-  const state = () => ({ muted, unlocked, mood });
+  const state = () => ({ muted, unlocked, mood, stoppedByUser });
   return { start, stop, setMood, playTransition, toggle, state };
 })();
 
@@ -466,8 +471,10 @@ function updateAudioToggle() {
   const button = document.querySelector("[data-audio-toggle]");
   if (!button) return;
   const state = moodixAudio.state();
-  button.textContent = !state.unlocked ? "Start sound" : state.muted ? "Sound off" : "Sound on";
-  button.setAttribute("aria-pressed", String(!state.muted));
+  const isPlaying = state.unlocked && !state.muted && !state.stoppedByUser;
+  button.hidden = !isPlaying;
+  button.textContent = "Stop music";
+  button.setAttribute("aria-pressed", String(isPlaying));
   button.dataset.audioState = state.muted ? "off" : "on";
 }
 
@@ -477,12 +484,13 @@ function setupSiteAudio() {
   button.className = "audio-toggle";
   button.type = "button";
   button.dataset.audioToggle = "true";
-  button.setAttribute("aria-label", "Toggle Moodix background music");
+  button.setAttribute("aria-label", "Stop Moodix background music");
+  button.hidden = true;
   document.body.append(button);
   updateAudioToggle();
 
   button.addEventListener("click", () => {
-    moodixAudio.toggle();
+    moodixAudio.stop();
   });
 
   const unlock = (event) => {
@@ -1758,6 +1766,6 @@ document.querySelector("[data-save-import]")?.addEventListener("click", saveImpo
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=34").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=35").catch(() => {});
   });
 }
