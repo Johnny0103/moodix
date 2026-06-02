@@ -93,7 +93,7 @@ const youtubeConfig = {
   scopes: "https://www.googleapis.com/auth/youtube.readonly"
 };
 const lastfmConfig = {
-  apiKey: ""
+  apiKey: "43489d760bd5d45de811456996ed8e5d"
 };
 
 const moodQuestions = [
@@ -1870,6 +1870,6 @@ document.querySelector("[data-save-import]")?.addEventListener("click", saveImpo
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=39").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=40").catch(() => {});
   });
 }
