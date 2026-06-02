@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=32">
+    <link rel="stylesheet" href="styles.css?v=33">
   </head>
   <body data-requires-signin>
     <header class="site-header">
@@ -46,6 +46,9 @@
           <span class="active">Result</span>
           <span>App</span>
         </div>
+        <div class="step-nav">
+          <a class="button secondary dark" href="import.html">Back to import</a>
+        </div>
 
         <article class="word-result-card">
           <p class="eyebrow">Emotional analyzing AI</p>
@@ -55,10 +58,13 @@
         </article>
 
         <div class="results-grid single" data-results-grid hidden></div>
-        <a class="button secondary dark" href="app-version.html" data-after-results hidden>Would you join the app version?</a>
+        <div class="step-actions">
+          <a class="button secondary dark" href="import.html">Back: change music import</a>
+          <a class="button primary" href="app-version.html" data-after-results hidden>Would you join the app version?</a>
+        </div>
       </section>
     </main>
 
-    <script src="app.js?v=32" defer></script>
+    <script src="app.js?v=33" defer></script>
   </body>
 </html>

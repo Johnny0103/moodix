@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=32">
+    <link rel="stylesheet" href="styles.css?v=33">
   </head>
   <body data-requires-signin>
     <header class="site-header">
@@ -45,6 +45,9 @@
           <span class="active">Import</span>
           <span>Result</span>
           <span>App</span>
+        </div>
+        <div class="step-nav">
+          <a class="button secondary dark" href="mood-check.html">Back to mood check</a>
         </div>
 
         <div class="section-heading compact">
@@ -142,13 +145,16 @@ Intro, The xx, focused, medium, indie electronic, work</textarea>
                 <li>Copy the Client ID into the Moodix Spotify config.</li>
               </ol>
             </div>
-            <a class="button secondary dark" href="result.html" data-result-link hidden>Continue to result</a>
+            <div class="step-actions">
+              <a class="button secondary dark" href="mood-check.html">Back: change mood</a>
+              <a class="button primary" href="result.html" data-result-link hidden>Continue to result</a>
+            </div>
           </section>
         </div>
       </section>
     </main>
 
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script src="app.js?v=32" defer></script>
+    <script src="app.js?v=33" defer></script>
   </body>
 </html>

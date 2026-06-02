@@ -1177,6 +1177,28 @@ main {
   color: #8a4300;
 }
 
+.step-nav,
+.step-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.step-nav {
+  justify-content: flex-start;
+}
+
+.step-actions {
+  margin-top: 18px;
+  margin-bottom: 0;
+}
+
+.dark-step-nav {
+  margin-top: 14px;
+}
+
 .dark-progress {
   margin-top: 28px;
 }

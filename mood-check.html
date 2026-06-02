@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Manrope:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=32">
+    <link rel="stylesheet" href="styles.css?v=33">
   </head>
   <body data-requires-signin>
     <header class="site-header">
@@ -57,6 +57,9 @@
           <span>Import</span>
           <span>Result</span>
           <span>App</span>
+        </div>
+        <div class="step-nav">
+          <a class="button secondary dark" href="index.html#signin">Back to sign in</a>
         </div>
 
         <div class="section-heading compact">
@@ -119,18 +122,24 @@
           <div class="analysis-detail">
             <span data-analysis-detail>Playlist matching will use this as the emotional filter.</span>
           </div>
-          <a class="button primary" href="import.html">Continue to import</a>
+          <div class="step-actions">
+            <a class="button secondary dark" href="mood-check.html">Back: change mood check</a>
+            <a class="button primary" href="import.html">Continue to import</a>
+          </div>
         </article>
 
         <article class="analysis-card" data-week-summary hidden>
           <p class="eyebrow">Weekly prediction saved</p>
           <h2>Your week has a mood map.</h2>
           <div class="week-summary-list" data-week-summary-list></div>
-          <a class="button primary" href="import.html">Continue to import</a>
+          <div class="step-actions">
+            <a class="button secondary dark" href="mood-check.html">Back: change week prediction</a>
+            <a class="button primary" href="import.html">Continue to import</a>
+          </div>
         </article>
       </section>
     </main>
 
-    <script src="app.js?v=32" defer></script>
+    <script src="app.js?v=33" defer></script>
   </body>
 </html>
