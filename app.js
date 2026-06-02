@@ -467,6 +467,36 @@ function setupLocalTime() {
   document.querySelectorAll("[data-local-time]").forEach((item) => item.textContent = `${meta.time} local time`);
 }
 
+function setupPressEffects() {
+  const selector = [
+    "button",
+    ".button",
+    ".header-cta",
+    ".step-card",
+    ".mode-choice",
+    ".wizard-option",
+    ".source-card",
+    ".intent-button",
+    ".audio-toggle"
+  ].join(",");
+
+  document.addEventListener("pointerdown", (event) => {
+    const target = event.target.closest?.(selector);
+    if (!target || target.disabled || target.getAttribute("aria-disabled") === "true") return;
+
+    const rect = target.getBoundingClientRect();
+    const ripple = document.createElement("span");
+    ripple.className = "press-ripple";
+    ripple.style.setProperty("--press-x", `${event.clientX - rect.left}px`);
+    ripple.style.setProperty("--press-y", `${event.clientY - rect.top}px`);
+
+    target.classList.add("is-pressing");
+    target.append(ripple);
+    window.setTimeout(() => target.classList.remove("is-pressing"), 180);
+    ripple.addEventListener("animationend", () => ripple.remove(), { once: true });
+  });
+}
+
 function updateAudioToggle() {
   const button = document.querySelector("[data-audio-toggle]");
   if (!button) return;
@@ -1751,6 +1781,7 @@ function setupScrollBoost() {
 
 setupLogoPicker();
 setupLocalTime();
+setupPressEffects();
 setupSiteAudio();
 setupSignin();
 requireSignin();
@@ -1772,6 +1803,6 @@ document.querySelector("[data-save-import]")?.addEventListener("click", saveImpo
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=36").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=37").catch(() => {});
   });
 }
