@@ -493,11 +493,17 @@ function setupSiteAudio() {
     moodixAudio.stop();
   });
 
+  const preferredMood = () => getStoredAnalysis()?.word || document.querySelector("[data-result-word]")?.textContent?.trim() || "Ambient";
+  const tryAutoplay = () => {
+    moodixAudio.start(preferredMood()).catch(() => {});
+  };
   const unlock = (event) => {
     if (event.target?.closest?.("[data-audio-toggle]")) return;
-    const word = getStoredAnalysis()?.word || document.querySelector("[data-result-word]")?.textContent?.trim() || "Ambient";
-    moodixAudio.start(word);
+    moodixAudio.start(preferredMood());
   };
+  tryAutoplay();
+  document.addEventListener("DOMContentLoaded", tryAutoplay, { once: true });
+  window.addEventListener("load", tryAutoplay, { once: true });
   window.addEventListener("pointerdown", unlock, { once: true });
   window.addEventListener("keydown", unlock, { once: true });
   window.addEventListener("wheel", unlock, { once: true });
@@ -1766,6 +1772,6 @@ document.querySelector("[data-save-import]")?.addEventListener("click", saveImpo
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=35").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=36").catch(() => {});
   });
 }
