@@ -1382,8 +1382,27 @@ async function youtubeFetch(path, params = {}) {
   const response = await fetch(`https://www.googleapis.com/youtube/v3/${path}?${query.toString()}`, {
     headers: { Authorization: `Bearer ${token}` }
   });
-  if (!response.ok) throw new Error("YouTube request failed. Check your OAuth setup and API access.");
-  return response.json();
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const message = data.error?.message || "YouTube request failed.";
+    throw new Error(`${message} Check YouTube Data API access and OAuth test-user settings.`);
+  }
+  return data;
+}
+
+async function youtubeFetchAll(path, params = {}, limit = 100) {
+  const items = [];
+  let pageToken = "";
+  do {
+    const data = await youtubeFetch(path, {
+      ...params,
+      maxResults: String(Math.min(50, limit - items.length)),
+      ...(pageToken ? { pageToken } : {})
+    });
+    items.push(...(data.items || []));
+    pageToken = data.nextPageToken || "";
+  } while (pageToken && items.length < limit);
+  return items;
 }
 
 function youtubeItemToSong(item) {
@@ -1413,12 +1432,11 @@ function normalizeImportedTracks(tracks) {
 async function loadYouTubePlaylist(playlistId) {
   const note = document.querySelector("[data-import-note]");
   const link = document.querySelector("[data-result-link]");
-  const data = await youtubeFetch("playlistItems", {
+  const items = await youtubeFetchAll("playlistItems", {
     part: "snippet",
-    playlistId,
-    maxResults: "50"
-  });
-  const tracks = normalizeImportedTracks((data.items || []).map(youtubeItemToSong));
+    playlistId
+  }, 100);
+  const tracks = normalizeImportedTracks(items.map(youtubeItemToSong));
   setJSON(storageKeys.tracks, tracks.length ? tracks : demoSongs);
   storageSet(storageKeys.source, "YouTube Music");
   if (note) note.innerHTML = `Imported <strong>${tracks.length || demoSongs.length}</strong> tracks from <strong>YouTube</strong>.`;
@@ -1444,12 +1462,11 @@ function renderYouTubePlaylists(playlists) {
 
 async function loadYouTubePlaylists() {
   const status = document.querySelector("[data-youtube-status]");
-  const data = await youtubeFetch("playlists", {
+  const items = await youtubeFetchAll("playlists", {
     part: "snippet,contentDetails",
-    mine: "true",
-    maxResults: "25"
-  });
-  renderYouTubePlaylists(data.items || []);
+    mine: "true"
+  }, 50);
+  renderYouTubePlaylists(items);
   if (status) status.textContent = "YouTube connected. Choose a playlist below to import tracks.";
 }
 
@@ -1471,7 +1488,11 @@ function startYouTubeAuth() {
     scope: youtubeConfig.scopes,
     callback: async (response) => {
       if (response.error) {
-        if (status) status.textContent = response.error;
+        if (status) {
+          status.textContent = response.error === "access_denied"
+            ? "Google denied access. While Moodix is unverified, add your Google account as a test user in Google Cloud, then try again."
+            : response.error;
+        }
         return;
       }
       setYouTubeAccessToken(response.access_token, response.expires_in);
@@ -1493,6 +1514,8 @@ function setupYouTubeImport() {
 
   if (!getYouTubeClientId() && status) {
     status.innerHTML = "YouTube import is ready for setup. Add a Google OAuth Client ID in <strong>app.js</strong> to let users connect playlists directly.";
+  } else if (status && !getYouTubeAccessToken()) {
+    status.textContent = "YouTube is configured. Connect your Google account to import playlists.";
   }
 
   connect?.addEventListener("click", startYouTubeAuth);
@@ -1870,6 +1893,6 @@ document.querySelector("[data-save-import]")?.addEventListener("click", saveImpo
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=40").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=41").catch(() => {});
   });
 }
