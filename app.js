@@ -1385,6 +1385,9 @@ async function youtubeFetch(path, params = {}) {
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
     const message = data.error?.message || "YouTube request failed.";
+    if (/channel not found/i.test(message)) {
+      throw new Error("YouTube channel not found for this Google account. Open YouTube once with this account, create/activate a channel, add at least one playlist, then reconnect Moodix.");
+    }
     throw new Error(`${message} Check YouTube Data API access and OAuth test-user settings.`);
   }
   return data;
@@ -1893,6 +1896,6 @@ document.querySelector("[data-save-import]")?.addEventListener("click", saveImpo
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=41").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=42").catch(() => {});
   });
 }
