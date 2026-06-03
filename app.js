@@ -1679,9 +1679,19 @@ function setupSourceChips() {
   const chips = document.querySelectorAll("[data-source]");
   const label = document.querySelector("[data-selected-source]");
   const note = document.querySelector("[data-auth-note]");
+  const importNote = document.querySelector("[data-import-note]");
+  const panels = document.querySelectorAll("[data-import-panel]");
+  const hasImportPanels = panels.length > 0;
+
+  const showImportPanel = (method) => {
+    panels.forEach((panel) => {
+      panel.hidden = panel.dataset.importPanel !== method;
+    });
+  };
+
   const saved = storageGet(storageKeys.source);
-  const active = Array.from(chips).find((chip) => chip.dataset.source === saved) || Array.from(chips).find((chip) => chip.classList.contains("active"));
-  if (active) {
+  const active = hasImportPanels ? null : Array.from(chips).find((chip) => chip.dataset.source === saved) || Array.from(chips).find((chip) => chip.classList.contains("active"));
+  if (active && !hasImportPanels) {
     chips.forEach((item) => item.classList.toggle("active", item === active));
     if (label) label.textContent = active.dataset.source;
     storageSet(storageKeys.source, active.dataset.source);
@@ -1691,20 +1701,112 @@ function setupSourceChips() {
       chips.forEach((item) => item.classList.toggle("active", item === chip));
       if (label) label.textContent = chip.dataset.source;
       storageSet(storageKeys.source, chip.dataset.source);
+      if (chip.dataset.importMethod) showImportPanel(chip.dataset.importMethod);
       if (note) {
-        if (chip.dataset.source === "YouTube Music") note.textContent = "YouTube selected. Add a Google OAuth Client ID to activate direct playlist import, or save playlist rows manually.";
-        else if (chip.dataset.source === "Last.fm") note.textContent = "Last.fm selected. Add a free API key and username to import recent, top, or loved tracks.";
-        else note.textContent = "Spotify selected. Use this once Spotify Web API access is available, or save playlist rows manually.";
+        if (chip.dataset.source === "YouTube Music") note.textContent = "YouTube selected. Connect Google, then choose a playlist.";
+        else if (chip.dataset.source === "Last.fm") note.textContent = "Last.fm selected. Enter a username, then import recent, top, or loved tracks.";
+        else if (chip.dataset.source === "Manual import") note.textContent = "Manual import selected. Add songs one by one or paste a list.";
+        else note.textContent = `${chip.dataset.source} selected.`;
+      }
+      if (importNote) {
+        if (chip.dataset.source === "YouTube Music") importNote.textContent = "YouTube selected. Connect Google to choose a playlist.";
+        else if (chip.dataset.source === "Last.fm") importNote.textContent = "Last.fm selected. Enter a username to import listening history.";
+        else if (chip.dataset.source === "Manual import") importNote.textContent = "Manual import selected. Add songs, then save.";
       }
     });
   });
+}
+
+function setupManualImport() {
+  const title = document.querySelector("[data-manual-title]");
+  const artist = document.querySelector("[data-manual-artist]");
+  const vibe = document.querySelector("[data-manual-vibe]");
+  const add = document.querySelector("[data-add-manual-song]");
+  const save = document.querySelector("[data-save-manual-songs]");
+  const list = document.querySelector("[data-manual-song-list]");
+  const note = document.querySelector("[data-import-note]");
+  const link = document.querySelector("[data-result-link]");
+  if (!title && !artist && !add && !save && !list) return;
+
+  const songs = [];
+  const render = () => {
+    if (!list) return;
+    if (!songs.length) {
+      list.innerHTML = "<p>No songs added yet.</p>";
+      return;
+    }
+    list.innerHTML = `
+      <strong>${songs.length} song${songs.length === 1 ? "" : "s"} added</strong>
+      <ol>
+        ${songs.map((song, index) => `
+          <li>
+            <span>${escapeHTML(song.title)} — ${escapeHTML(song.artist)}</span>
+            <button type="button" data-remove-manual-song="${index}" aria-label="Remove ${escapeHTML(song.title)}">Remove</button>
+          </li>
+        `).join("")}
+      </ol>
+    `;
+  };
+
+  const addSong = () => {
+    const nextTitle = title?.value.trim();
+    const nextArtist = artist?.value.trim();
+    if (!nextTitle || !nextArtist) {
+      if (note) note.textContent = "Add both a song title and artist first.";
+      return;
+    }
+    const song = {
+      title: nextTitle,
+      artist: nextArtist,
+      mood: normalize(vibe?.value || ""),
+      energy: "",
+      genre: "manual",
+      activity: ""
+    };
+    song.mood = song.mood || inferMood(song);
+    song.energy = inferEnergy(song);
+    songs.push(song);
+    title.value = "";
+    artist.value = "";
+    if (vibe) vibe.value = "";
+    if (note) note.textContent = "Song added. Add more or save your manual import.";
+    render();
+    title?.focus();
+  };
+
+  add?.addEventListener("click", addSong);
+  [title, artist].forEach((field) => {
+    field?.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        addSong();
+      }
+    });
+  });
+  list?.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-remove-manual-song]");
+    if (!button) return;
+    songs.splice(Number(button.dataset.removeManualSong), 1);
+    render();
+  });
+  save?.addEventListener("click", () => {
+    if (!songs.length) {
+      if (note) note.textContent = "Add at least one song before saving.";
+      return;
+    }
+    setJSON(storageKeys.tracks, songs);
+    storageSet(storageKeys.source, "Manual import");
+    if (note) note.innerHTML = `Saved <strong>${songs.length}</strong> manual song${songs.length === 1 ? "" : "s"}.`;
+    link?.removeAttribute("hidden");
+  });
+  render();
 }
 
 async function saveImport() {
   const note = document.querySelector("[data-import-note]");
   const link = document.querySelector("[data-result-link]");
   const tracks = parsePlaylist(await getPlaylistText());
-  const selected = storageGet(storageKeys.source) || "Spotify";
+  const selected = storageGet(storageKeys.source) || "Manual import";
   setJSON(storageKeys.tracks, tracks.length ? tracks : demoSongs);
   if (note) note.innerHTML = `Saved <strong>${tracks.length || demoSongs.length}</strong> tracks from <strong>${selected}</strong> for today's result.`;
   link?.removeAttribute("hidden");
@@ -1884,10 +1986,10 @@ setupDayForm();
 setupMoodMode();
 setupWeekForm();
 setupImportContext();
-setupSpotifyImport();
 setupYouTubeImport();
 setupLastfmImport();
 setupSourceChips();
+setupManualImport();
 setupIntentButtons();
 setupSignup();
 setupResultPage();
@@ -1896,6 +1998,6 @@ document.querySelector("[data-save-import]")?.addEventListener("click", saveImpo
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=42").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=43").catch(() => {});
   });
 }

@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=42">
+    <link rel="stylesheet" href="styles.css?v=43">
   </head>
   <body data-requires-signin>
     <header class="site-header">
@@ -50,24 +50,33 @@
           <a class="button secondary dark" href="mood-check.html">Back to mood check</a>
         </div>
 
-        <div class="section-heading compact">
-          <p class="eyebrow">Music authorization</p>
-          <h2>Choose a direct path, then keep manual upload as backup.</h2>
-          <p>YouTube is the direct account connection. Last.fm is the fastest low-cost fallback: users type a Last.fm username and Moodix pulls public listening history.</p>
+        <div class="section-heading compact import-choice-heading">
+          <p class="eyebrow">Music import</p>
+          <h2>How do you want to bring music in?</h2>
+          <p>Choose one path. Moodix will only show the fields you need.</p>
         </div>
 
-        <div class="source-picker" aria-label="Prototype music source options">
-          <button class="source-card active" type="button" data-source="YouTube Music"><span>YouTube / YouTube Music</span><small>Direct Google playlist import</small></button>
-          <button class="source-card" type="button" data-source="Last.fm"><span>Last.fm</span><small>Import recent, top, or loved tracks</small></button>
-          <button class="source-card" type="button" data-source="Spotify"><span>Spotify</span><small>Ready when Web API unlocks</small></button>
+        <div class="source-picker import-method-picker" aria-label="Music import options">
+          <button class="source-card" type="button" data-source="YouTube Music" data-import-method="youtube">
+            <span>YouTube</span>
+            <small>Connect your Google account and choose a playlist.</small>
+          </button>
+          <button class="source-card" type="button" data-source="Last.fm" data-import-method="lastfm">
+            <span>Last.fm</span>
+            <small>Enter a username and import listening history.</small>
+          </button>
+          <button class="source-card" type="button" data-source="Manual import" data-import-method="manual">
+            <span>Manual import</span>
+            <small>Add songs quickly, or paste/upload a list.</small>
+          </button>
         </div>
 
         <div class="upload-layout">
           <div class="upload-box">
-            <div class="connect-card youtube-connect-card">
+            <div class="connect-card import-panel youtube-connect-card" data-import-panel="youtube" hidden>
               <div>
-                <p class="eyebrow">Most convenient free path</p>
-                <h3>Connect YouTube playlists.</h3>
+                <p class="eyebrow">YouTube</p>
+                <h3>Connect and choose a playlist.</h3>
                 <p data-youtube-status>YouTube is configured. Connect your Google account, choose a playlist, and Moodix will import the track titles.</p>
               </div>
               <button class="button primary" type="button" data-youtube-connect>Connect YouTube</button>
@@ -79,18 +88,12 @@
               </p>
             </div>
 
-            <div class="connect-card lastfm-connect-card">
+            <div class="connect-card import-panel lastfm-connect-card" data-import-panel="lastfm" hidden>
               <div>
-                <p class="eyebrow">No playlist permission needed</p>
-                <h3>Import Last.fm history.</h3>
+                <p class="eyebrow">Last.fm</p>
+                <h3>Import by username.</h3>
                 <p data-lastfm-status>Enter a Last.fm username to import public recent, top, or loved tracks once an API key is configured.</p>
               </div>
-              <label for="lastfm-api-key">Developer API key</label>
-              <div class="inline-import-row setup-row">
-                <input id="lastfm-api-key" type="text" placeholder="Already configured for Moodix" data-lastfm-api-key>
-                <button class="button secondary dark" type="button" data-lastfm-save-key>Save key</button>
-              </div>
-              <p class="helper-text">Moodix now has the developer key configured. Users should only need their Last.fm username.</p>
               <label for="lastfm-username">Last.fm username</label>
               <div class="inline-import-row lastfm-action-row">
                 <input id="lastfm-username" type="text" placeholder="yourusername" data-lastfm-username>
@@ -100,59 +103,72 @@
               </div>
             </div>
 
-            <div class="spotify-connect-card">
+            <div class="connect-card import-panel manual-import-card" data-import-panel="manual" hidden>
               <div>
-                <p class="eyebrow">Spotify direct import</p>
-                <h3>Connect your Spotify playlists.</h3>
-                <p data-spotify-status>Add a Spotify Client ID in app.js to activate the live connect button.</p>
+                <p class="eyebrow">Manual import</p>
+                <h3>Add a few songs fast.</h3>
+                <p>Type a song and artist, add it to the list, then save. Moodix can still rank the music by your mood.</p>
               </div>
-              <button class="button primary" type="button" data-spotify-connect>Connect Spotify</button>
-              <div class="spotify-playlists" data-spotify-playlists hidden></div>
-              <p class="helper-text">
-                Redirect URI to add in Spotify Dashboard:
-                <strong>https://johnny0103.github.io/moodix/import.html</strong>
-              </p>
-            </div>
+              <div class="manual-song-grid">
+                <label for="manual-title">Song title</label>
+                <input id="manual-title" type="text" placeholder="Blinding Lights" data-manual-title>
+                <label for="manual-artist">Artist</label>
+                <input id="manual-artist" type="text" placeholder="The Weeknd" data-manual-artist>
+                <label for="manual-vibe">Vibe</label>
+                <select id="manual-vibe" data-manual-vibe>
+                  <option value="">Let Moodix guess</option>
+                  <option value="focused">Focused</option>
+                  <option value="restorative">Restorative</option>
+                  <option value="bright">Bright</option>
+                  <option value="tender">Tender</option>
+                  <option value="electric">Electric</option>
+                  <option value="grounded">Grounded</option>
+                  <option value="reflective">Reflective</option>
+                </select>
+                <button class="button secondary dark" type="button" data-add-manual-song>Add song</button>
+              </div>
+              <div class="manual-song-list" data-manual-song-list aria-live="polite"></div>
+              <button class="button primary" type="button" data-save-manual-songs>Save manual songs</button>
 
-            <label for="playlist-file">CSV file</label>
-            <input id="playlist-file" type="file" accept=".csv,text/csv,text/plain" data-playlist-file>
-            <label for="playlist-paste">Paste tracks</label>
-            <textarea id="playlist-paste" data-playlist-text rows="10" spellcheck="false">Blinding Lights, The Weeknd, electric, high, synthpop, commute
+              <details class="advanced-import">
+                <summary>Paste or upload a list instead</summary>
+                <label for="playlist-file">CSV file</label>
+                <input id="playlist-file" type="file" accept=".csv,text/csv,text/plain" data-playlist-file>
+                <label for="playlist-paste">Paste tracks</label>
+                <textarea id="playlist-paste" data-playlist-text rows="8" spellcheck="false">Blinding Lights, The Weeknd, electric, high, synthpop, commute
 Sunflower, Post Malone and Swae Lee, bright, medium, pop, morning
 Weightless, Marconi Union, restorative, low, ambient, rest
 Good Days, SZA, reflective, medium, r&b, unwind
 Levitating, Dua Lipa, bright, high, dance, workout
 Intro, The xx, focused, medium, indie electronic, work</textarea>
-            <button class="button primary" type="button" data-save-import>Save music import</button>
-            <p class="helper-text" data-import-note>Prototype source: <strong data-selected-source>YouTube Music</strong>. Real provider tokens are not stored permanently.</p>
+                <button class="button primary" type="button" data-save-import>Save pasted list</button>
+              </details>
+            </div>
+            <p class="helper-text import-status-note" data-import-note>Choose YouTube, Last.fm, or Manual import to start.</p>
           </div>
 
           <section class="auth-panel" aria-labelledby="auth-title">
-            <p class="eyebrow">Connection status</p>
-            <h2 id="auth-title">Start with YouTube, then Last.fm.</h2>
-            <p data-auth-note>YouTube uses Google OAuth in the browser. Last.fm uses one free developer API key plus a user’s public username. CSV and paste remain the safest fallback.</p>
+            <p class="eyebrow">Simple guide</p>
+            <h2 id="auth-title">Pick the easiest path.</h2>
+            <p data-auth-note>YouTube is best if the user has playlists. Last.fm is best if the user already tracks listening history. Manual import is best for a quick prototype test.</p>
             <div class="auth-steps">
-              <strong>To authorize YouTube / YouTube Music</strong>
+              <strong>YouTube</strong>
               <ol>
-                <li>YouTube Data API v3 is the direct account import path.</li>
-                <li>The Moodix OAuth Client ID is now configured in <code>app.js</code>.</li>
-                <li>Keep <code>https://johnny0103.github.io</code> as an authorized JavaScript origin in Google Cloud.</li>
-                <li>Add your own Google account under OAuth test users while the app is unverified.</li>
-                <li>Make sure that Google account has opened YouTube and has an active YouTube channel/profile.</li>
-                <li>After verification, users can connect normally from this page.</li>
+                <li>Connect Google.</li>
+                <li>Choose a playlist.</li>
+                <li>Moodix imports song titles.</li>
               </ol>
-              <strong>To authorize Last.fm</strong>
+              <strong>Last.fm</strong>
               <ol>
-                <li>Go to <a href="https://www.last.fm/api/account/create" target="_blank" rel="noreferrer">last.fm/api/account/create</a>.</li>
-                <li>Create an API account and copy the API key, not the shared secret.</li>
-                <li>The Moodix Last.fm key is now configured in <code>app.js</code>.</li>
-                <li>Users can import by entering only their public Last.fm username.</li>
+                <li>Enter username.</li>
+                <li>Choose recent, top, or loved tracks.</li>
+                <li>No playlist permission needed.</li>
               </ol>
-              <strong>Spotify later</strong>
+              <strong>Manual import</strong>
               <ol>
-                <li>Create a Spotify Developer app.</li>
-                <li>Add the redirect URI shown on this page.</li>
-                <li>Copy the Client ID into the Moodix Spotify config.</li>
+                <li>Add songs one by one.</li>
+                <li>Or paste/upload a list.</li>
+                <li>Save and continue to results.</li>
               </ol>
             </div>
             <div class="step-actions">
@@ -165,6 +181,6 @@ Intro, The xx, focused, medium, indie electronic, work</textarea>
     </main>
 
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script src="app.js?v=42" defer></script>
+    <script src="app.js?v=43" defer></script>
   </body>
 </html>
