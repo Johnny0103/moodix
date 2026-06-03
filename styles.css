@@ -2055,6 +2055,12 @@ main {
   color: rgba(248, 251, 255, 0.76);
 }
 
+.signup-copy h1 {
+  max-width: 720px;
+  font-size: clamp(3.6rem, 8vw, 7.4rem);
+  line-height: 0.9;
+}
+
 .intent-buttons {
   display: flex;
   flex-wrap: wrap;
@@ -2076,6 +2082,30 @@ main {
 .intent-button.active {
   background: var(--ink);
   color: var(--night);
+}
+
+.intent-summary {
+  width: min(620px, 100%);
+  margin-top: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 12% 10%, rgba(255, 188, 46, 0.18), transparent 38%),
+    rgba(255, 255, 255, 0.075);
+  padding: 16px 18px;
+}
+
+.intent-summary strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--ink);
+  font-size: 1.05rem;
+}
+
+.intent-summary p {
+  margin: 0;
+  color: rgba(248, 251, 255, 0.74);
+  line-height: 1.55;
 }
 
 .signup-card {

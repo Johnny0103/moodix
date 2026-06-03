@@ -1894,12 +1894,39 @@ function setupResultPage() {
 function setupIntentButtons() {
   const buttons = document.querySelectorAll("[data-intent]");
   const field = document.querySelector("[data-intent-field]");
+  const summary = document.querySelector("[data-intent-summary]");
+  const summaries = {
+    yes: {
+      title: "Early access",
+      body: "You want to try the app version first, including smoother Spotify import when it becomes available."
+    },
+    maybe: {
+      title: "Send updates",
+      body: "You are interested, but want progress notes before joining. Moodix can send updates when app features are ready."
+    },
+    later: {
+      title: "Later",
+      body: "No pressure. Moodix will keep the website version simple while the app version develops in the background."
+    }
+  };
+
+  const renderSummary = (intent) => {
+    if (!summary) return;
+    const next = summaries[intent] || summaries.yes;
+    summary.innerHTML = `
+      <strong>${next.title}</strong>
+      <p>${next.body}</p>
+    `;
+  };
+
   buttons.forEach((button) => {
     button.addEventListener("click", () => {
       buttons.forEach((item) => item.classList.toggle("active", item === button));
       if (field) field.value = button.dataset.intent;
+      renderSummary(button.dataset.intent);
     });
   });
+  renderSummary(field?.value || "yes");
 }
 
 function setupSignup() {
@@ -1997,6 +2024,6 @@ document.querySelector("[data-save-import]")?.addEventListener("click", saveImpo
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=44").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=45").catch(() => {});
   });
 }
