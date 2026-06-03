@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=46">
+    <link rel="stylesheet" href="styles.css?v=47">
   </head>
   <body data-requires-signin>
     <header class="site-header">
@@ -29,8 +29,8 @@
       <section class="flow-hero compact-flow" aria-labelledby="result-title">
         <div>
           <p class="eyebrow">Step 3 / Result</p>
-          <h1 id="result-title">Today's emotional word.</h1>
-          <p class="hero-copy">Moodix summarizes the check-in first. Then you can reveal the five songs for today.</p>
+          <h1 id="result-title" data-result-word>Reflective</h1>
+          <p class="hero-copy" data-result-summary>Moodix chooses one word for your day, then builds music around it.</p>
         </div>
         <aside class="today-card">
           <span data-local-weekday>Today</span>
@@ -50,20 +50,19 @@
           <a class="button secondary dark" href="import.html">Back to import</a>
         </div>
 
-        <article class="word-result-card">
-          <p class="eyebrow">Emotional analyzing AI</p>
-          <h2 data-result-word>Reflective</h2>
-          <p data-result-summary>Complete the mood check to generate a sharper word for today.</p>
-          <button class="button primary" type="button" data-reveal-songs>Next: show today's top five</button>
+        <article class="word-result-card result-preview-card" data-result-preview>
+          <p class="eyebrow">What this page shows</p>
+          <h2>Your mood, translated into music.</h2>
+          <p>If you import music, Moodix shows a chosen word to describe your mood and a top five music playlist from your songs. It also recommends more music based on the mood it reads.</p>
         </article>
 
-        <div class="results-grid single" data-results-grid hidden></div>
+        <div class="results-grid result-columns" data-results-grid></div>
         <div class="step-actions">
           <a class="button secondary dark" href="import.html">Back: change music import</a>
         </div>
       </section>
     </main>
 
-    <script src="app.js?v=46" defer></script>
+    <script src="app.js?v=47" defer></script>
   </body>
 </html>

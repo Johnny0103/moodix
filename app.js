@@ -415,6 +415,39 @@ const demoSongs = [
   { title: "Intro", artist: "The xx", mood: "focused", energy: "medium", genre: "indie electronic", activity: "work" }
 ];
 
+const recommendedSongs = [
+  { title: "Cirrus", artist: "Bonobo", mood: "focused", energy: "medium", genre: "electronic", activity: "work" },
+  { title: "A Walk", artist: "Tycho", mood: "focused", energy: "medium", genre: "ambient electronic", activity: "study" },
+  { title: "Avril 14th", artist: "Aphex Twin", mood: "focused", energy: "low", genre: "piano", activity: "study" },
+  { title: "Night Owl", artist: "Galimatias", mood: "focused", energy: "medium", genre: "electronic", activity: "work" },
+  { title: "Bloom", artist: "ODESZA", mood: "bright", energy: "medium", genre: "electronic", activity: "morning" },
+  { title: "Sweet Disposition", artist: "The Temper Trap", mood: "bright", energy: "high", genre: "indie", activity: "commute" },
+  { title: "Golden", artist: "Harry Styles", mood: "bright", energy: "high", genre: "pop", activity: "morning" },
+  { title: "Walking on a Dream", artist: "Empire of the Sun", mood: "bright", energy: "high", genre: "synthpop", activity: "social" },
+  { title: "Innerbloom", artist: "RUFUS DU SOL", mood: "reflective", energy: "medium", genre: "electronic", activity: "night" },
+  { title: "Wait", artist: "M83", mood: "reflective", energy: "low", genre: "ambient", activity: "night" },
+  { title: "Motion Picture Soundtrack", artist: "Radiohead", mood: "reflective", energy: "low", genre: "alternative", activity: "unwind" },
+  { title: "Retrograde", artist: "James Blake", mood: "reflective", energy: "medium", genre: "electronic soul", activity: "unwind" },
+  { title: "Sea of Love", artist: "Cat Power", mood: "tender", energy: "low", genre: "folk", activity: "unwind" },
+  { title: "Cherry Wine", artist: "Hozier", mood: "tender", energy: "low", genre: "folk", activity: "night" },
+  { title: "Heartbeats", artist: "Jose Gonzalez", mood: "tender", energy: "low", genre: "acoustic", activity: "home" },
+  { title: "First Day of My Life", artist: "Bright Eyes", mood: "tender", energy: "medium", genre: "folk", activity: "morning" },
+  { title: "Weightless", artist: "Marconi Union", mood: "restorative", energy: "low", genre: "ambient", activity: "rest" },
+  { title: "An Ending (Ascent)", artist: "Brian Eno", mood: "restorative", energy: "low", genre: "ambient", activity: "rest" },
+  { title: "Near Light", artist: "Olafur Arnalds", mood: "restorative", energy: "low", genre: "modern classical", activity: "rest" },
+  { title: "Sunset Lover", artist: "Petit Biscuit", mood: "restorative", energy: "medium", genre: "electronic", activity: "home" },
+  { title: "Go!", artist: "M83", mood: "electric", energy: "high", genre: "electronic", activity: "commute" },
+  { title: "Titanium", artist: "David Guetta and Sia", mood: "electric", energy: "high", genre: "dance", activity: "workout" },
+  { title: "1901", artist: "Phoenix", mood: "electric", energy: "high", genre: "indie", activity: "weekend" },
+  { title: "Dog Days Are Over", artist: "Florence + The Machine", mood: "electric", energy: "high", genre: "indie", activity: "workout" },
+  { title: "Holocene", artist: "Bon Iver", mood: "grounded", energy: "low", genre: "folk", activity: "morning" },
+  { title: "Rivers and Roads", artist: "The Head and the Heart", mood: "grounded", energy: "medium", genre: "folk", activity: "home" },
+  { title: "Ends of the Earth", artist: "Lord Huron", mood: "grounded", energy: "medium", genre: "folk", activity: "commute" },
+  { title: "Home", artist: "Edward Sharpe and the Magnetic Zeros", mood: "grounded", energy: "medium", genre: "folk", activity: "social" },
+  { title: "Intro", artist: "The xx", mood: "focused", energy: "medium", genre: "indie electronic", activity: "work" },
+  { title: "Midnight City", artist: "M83", mood: "electric", energy: "high", genre: "electronic", activity: "night" }
+];
+
 const wordProfiles = {
   Focused: { moods: ["focused", "grounded"], energy: "medium", activities: ["work", "study"] },
   Restorative: { moods: ["restorative", "grounded"], energy: "low", activities: ["rest", "sleep", "home"] },
@@ -1840,29 +1873,52 @@ function rankSongs(songs, analysis) {
     .slice(0, 5);
 }
 
-function renderTopFive(songs, analysis) {
+function rankRecommendations(analysis) {
+  return recommendedSongs
+    .map((song) => ({ ...song, score: scoreSong(song, analysis), fallback: false }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 30);
+}
+
+function renderSongItems(songs, analysis, showReason = true) {
+  return songs.map((song) => `
+    <li>
+      <span class="song-rank">${song.score}</span>
+      <div>
+        <strong>${escapeHTML(song.title)}</strong>
+        <small>${escapeHTML(song.artist)}</small>
+        ${showReason ? `<p>${reasonFor(song, analysis, song.fallback)}</p>` : ""}
+      </div>
+    </li>
+  `).join("");
+}
+
+function renderResults(topSongs, recommended, analysis, hasImportedTracks) {
   const grid = document.querySelector("[data-results-grid]");
   if (!grid) return;
   grid.innerHTML = `
     <article class="result-card feature-result">
       <div class="result-card-top">
         <div>
-          <span>${analysis?.word || "Reflective"} / today</span>
-          <h3>Top five songs</h3>
+          <span>${hasImportedTracks ? "Imported music" : "Preview mode"} / ${analysis?.word || "Reflective"}</span>
+          <h3>${hasImportedTracks ? "Top five from your music" : "Top five preview"}</h3>
         </div>
         <strong>${analysis?.profile?.energy || "medium"}</strong>
       </div>
       <ol class="song-list">
-        ${songs.map((song) => `
-          <li>
-            <span class="song-rank">${song.score}</span>
-            <div>
-              <strong>${song.title}</strong>
-              <small>${song.artist}</small>
-              <p>${reasonFor(song, analysis, song.fallback)}</p>
-            </div>
-          </li>
-        `).join("")}
+        ${renderSongItems(topSongs, analysis)}
+      </ol>
+    </article>
+    <article class="result-card recommendation-result">
+      <div class="result-card-top">
+        <div>
+          <span>Mood recommendation</span>
+          <h3>30 songs for a ${String(analysis?.word || "Reflective").toLowerCase()} day</h3>
+        </div>
+        <strong>30</strong>
+      </div>
+      <ol class="song-list compact-song-list">
+        ${renderSongItems(recommended, analysis, false)}
       </ol>
     </article>
   `;
@@ -1872,23 +1928,27 @@ function renderTopFive(songs, analysis) {
 function setupResultPage() {
   const word = document.querySelector("[data-result-word]");
   const summary = document.querySelector("[data-result-summary]");
-  const reveal = document.querySelector("[data-reveal-songs]");
-  if (!word || !summary || !reveal) return;
+  const preview = document.querySelector("[data-result-preview]");
+  if (!word || !summary) return;
 
   const analysis = getStoredAnalysis() || {
     word: "Reflective",
-    detail: "Moodix needs today's mood check for a sharper result.",
+    detail: "Moodix can preview the result flow now. Complete the mood check and import music for a sharper personal match.",
     weekday: getLocalDayMeta().weekday,
     profile: wordProfiles.Reflective
   };
-  const tracks = getJSON(storageKeys.tracks, demoSongs);
+  const tracks = getJSON(storageKeys.tracks, []);
+  const hasImportedTracks = Array.isArray(tracks) && tracks.length > 0;
+  const sourceSongs = hasImportedTracks ? tracks : recommendedSongs;
   word.textContent = analysis.word;
-  summary.textContent = analysis.detail || `${analysis.weekday} reads as ${analysis.word.toLowerCase()}.`;
+  summary.textContent = hasImportedTracks
+    ? (analysis.detail || `${analysis.weekday} reads as ${analysis.word.toLowerCase()}.`)
+    : "Preview mode: if you import music, Moodix shows a chosen word to describe your mood and a top five music playlist from your songs.";
+  if (preview) {
+    preview.hidden = hasImportedTracks;
+  }
   moodixAudio.setMood(analysis.word);
-  reveal.addEventListener("click", () => {
-    renderTopFive(rankSongs(tracks, analysis), analysis);
-    reveal.hidden = true;
-  });
+  renderResults(rankSongs(sourceSongs, analysis), rankRecommendations(analysis), analysis, hasImportedTracks);
 }
 
 function setupIntentButtons() {
@@ -2024,6 +2084,6 @@ document.querySelector("[data-save-import]")?.addEventListener("click", saveImpo
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=46").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=47").catch(() => {});
   });
 }
