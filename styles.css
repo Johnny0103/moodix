@@ -2056,9 +2056,9 @@ main {
 }
 
 .signup-copy h1 {
-  max-width: 720px;
-  font-size: clamp(3.6rem, 8vw, 7.4rem);
-  line-height: 0.9;
+  max-width: 780px;
+  font-size: clamp(3rem, 5.8vw, 5.7rem);
+  line-height: 0.96;
 }
 
 .intent-buttons {
