@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Manrope:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=47">
+    <link rel="stylesheet" href="styles.css?v=48">
   </head>
   <body data-requires-signin>
     <header class="site-header">
@@ -124,7 +124,8 @@
           </div>
           <div class="step-actions">
             <a class="button secondary dark" href="mood-check.html">Back: change mood check</a>
-            <a class="button primary" href="import.html">Continue to import</a>
+            <a class="button secondary dark" href="result.html" data-skip-import-result>No import, show recommendations</a>
+            <a class="button primary" href="import.html" data-go-import>Import music first</a>
           </div>
         </article>
 
@@ -134,12 +135,13 @@
           <div class="week-summary-list" data-week-summary-list></div>
           <div class="step-actions">
             <a class="button secondary dark" href="mood-check.html">Back: change week prediction</a>
-            <a class="button primary" href="import.html">Continue to import</a>
+            <a class="button secondary dark" href="result.html" data-skip-import-result>No import, show recommendations</a>
+            <a class="button primary" href="import.html" data-go-import>Import music first</a>
           </div>
         </article>
       </section>
     </main>
 
-    <script src="app.js?v=47" defer></script>
+    <script src="app.js?v=48" defer></script>
   </body>
 </html>

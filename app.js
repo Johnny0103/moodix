@@ -8,6 +8,7 @@ const storageKeys = {
   checkMode: "moodix_check_mode",
   weekAnalysis: "moodix_week_analysis",
   introStamp: "moodix_intro_stamp",
+  importSkipped: "moodix_import_skipped",
   spotifyToken: "moodix_spotify_token",
   spotifyVerifier: "moodix_spotify_verifier",
   spotifyState: "moodix_spotify_state",
@@ -416,36 +417,36 @@ const demoSongs = [
 ];
 
 const recommendedSongs = [
-  { title: "Cirrus", artist: "Bonobo", mood: "focused", energy: "medium", genre: "electronic", activity: "work" },
-  { title: "A Walk", artist: "Tycho", mood: "focused", energy: "medium", genre: "ambient electronic", activity: "study" },
-  { title: "Avril 14th", artist: "Aphex Twin", mood: "focused", energy: "low", genre: "piano", activity: "study" },
-  { title: "Night Owl", artist: "Galimatias", mood: "focused", energy: "medium", genre: "electronic", activity: "work" },
-  { title: "Bloom", artist: "ODESZA", mood: "bright", energy: "medium", genre: "electronic", activity: "morning" },
-  { title: "Sweet Disposition", artist: "The Temper Trap", mood: "bright", energy: "high", genre: "indie", activity: "commute" },
-  { title: "Golden", artist: "Harry Styles", mood: "bright", energy: "high", genre: "pop", activity: "morning" },
-  { title: "Walking on a Dream", artist: "Empire of the Sun", mood: "bright", energy: "high", genre: "synthpop", activity: "social" },
-  { title: "Innerbloom", artist: "RUFUS DU SOL", mood: "reflective", energy: "medium", genre: "electronic", activity: "night" },
-  { title: "Wait", artist: "M83", mood: "reflective", energy: "low", genre: "ambient", activity: "night" },
-  { title: "Motion Picture Soundtrack", artist: "Radiohead", mood: "reflective", energy: "low", genre: "alternative", activity: "unwind" },
-  { title: "Retrograde", artist: "James Blake", mood: "reflective", energy: "medium", genre: "electronic soul", activity: "unwind" },
-  { title: "Sea of Love", artist: "Cat Power", mood: "tender", energy: "low", genre: "folk", activity: "unwind" },
-  { title: "Cherry Wine", artist: "Hozier", mood: "tender", energy: "low", genre: "folk", activity: "night" },
-  { title: "Heartbeats", artist: "Jose Gonzalez", mood: "tender", energy: "low", genre: "acoustic", activity: "home" },
-  { title: "First Day of My Life", artist: "Bright Eyes", mood: "tender", energy: "medium", genre: "folk", activity: "morning" },
-  { title: "Weightless", artist: "Marconi Union", mood: "restorative", energy: "low", genre: "ambient", activity: "rest" },
-  { title: "An Ending (Ascent)", artist: "Brian Eno", mood: "restorative", energy: "low", genre: "ambient", activity: "rest" },
-  { title: "Near Light", artist: "Olafur Arnalds", mood: "restorative", energy: "low", genre: "modern classical", activity: "rest" },
-  { title: "Sunset Lover", artist: "Petit Biscuit", mood: "restorative", energy: "medium", genre: "electronic", activity: "home" },
-  { title: "Go!", artist: "M83", mood: "electric", energy: "high", genre: "electronic", activity: "commute" },
-  { title: "Titanium", artist: "David Guetta and Sia", mood: "electric", energy: "high", genre: "dance", activity: "workout" },
-  { title: "1901", artist: "Phoenix", mood: "electric", energy: "high", genre: "indie", activity: "weekend" },
-  { title: "Dog Days Are Over", artist: "Florence + The Machine", mood: "electric", energy: "high", genre: "indie", activity: "workout" },
-  { title: "Holocene", artist: "Bon Iver", mood: "grounded", energy: "low", genre: "folk", activity: "morning" },
-  { title: "Rivers and Roads", artist: "The Head and the Heart", mood: "grounded", energy: "medium", genre: "folk", activity: "home" },
-  { title: "Ends of the Earth", artist: "Lord Huron", mood: "grounded", energy: "medium", genre: "folk", activity: "commute" },
-  { title: "Home", artist: "Edward Sharpe and the Magnetic Zeros", mood: "grounded", energy: "medium", genre: "folk", activity: "social" },
-  { title: "Intro", artist: "The xx", mood: "focused", energy: "medium", genre: "indie electronic", activity: "work" },
-  { title: "Midnight City", artist: "M83", mood: "electric", energy: "high", genre: "electronic", activity: "night" }
+  { title: "As It Was", artist: "Harry Styles", mood: "bright", energy: "high", genre: "pop", activity: "morning" },
+  { title: "Cruel Summer", artist: "Taylor Swift", mood: "bright", energy: "high", genre: "pop", activity: "social" },
+  { title: "Levitating", artist: "Dua Lipa", mood: "bright", energy: "high", genre: "dance pop", activity: "workout" },
+  { title: "Good Days", artist: "SZA", mood: "reflective", energy: "medium", genre: "r&b", activity: "unwind" },
+  { title: "Sunflower", artist: "Post Malone and Swae Lee", mood: "bright", energy: "medium", genre: "pop", activity: "morning" },
+  { title: "Blinding Lights", artist: "The Weeknd", mood: "electric", energy: "high", genre: "synthpop", activity: "commute" },
+  { title: "Save Your Tears", artist: "The Weeknd", mood: "reflective", energy: "medium", genre: "pop", activity: "night" },
+  { title: "Anti-Hero", artist: "Taylor Swift", mood: "reflective", energy: "medium", genre: "pop", activity: "unwind" },
+  { title: "Flowers", artist: "Miley Cyrus", mood: "bright", energy: "high", genre: "pop", activity: "morning" },
+  { title: "Heat Waves", artist: "Glass Animals", mood: "reflective", energy: "medium", genre: "indie pop", activity: "night" },
+  { title: "drivers license", artist: "Olivia Rodrigo", mood: "tender", energy: "low", genre: "pop ballad", activity: "unwind" },
+  { title: "vampire", artist: "Olivia Rodrigo", mood: "electric", energy: "high", genre: "pop rock", activity: "night" },
+  { title: "Golden Hour", artist: "JVKE", mood: "tender", energy: "medium", genre: "pop", activity: "home" },
+  { title: "Stay", artist: "The Kid LAROI and Justin Bieber", mood: "electric", energy: "high", genre: "pop", activity: "commute" },
+  { title: "Ghost", artist: "Justin Bieber", mood: "tender", energy: "medium", genre: "pop", activity: "unwind" },
+  { title: "Peaches", artist: "Justin Bieber", mood: "bright", energy: "medium", genre: "r&b pop", activity: "social" },
+  { title: "Watermelon Sugar", artist: "Harry Styles", mood: "bright", energy: "high", genre: "pop", activity: "social" },
+  { title: "Someone Like You", artist: "Adele", mood: "tender", energy: "low", genre: "soul pop", activity: "night" },
+  { title: "Easy On Me", artist: "Adele", mood: "reflective", energy: "low", genre: "soul pop", activity: "unwind" },
+  { title: "Lovely", artist: "Billie Eilish and Khalid", mood: "reflective", energy: "low", genre: "alternative pop", activity: "night" },
+  { title: "Ocean Eyes", artist: "Billie Eilish", mood: "tender", energy: "low", genre: "alternative pop", activity: "rest" },
+  { title: "Die For You", artist: "The Weeknd", mood: "tender", energy: "medium", genre: "r&b", activity: "night" },
+  { title: "Bad Habit", artist: "Steve Lacy", mood: "grounded", energy: "medium", genre: "funk pop", activity: "home" },
+  { title: "Redbone", artist: "Childish Gambino", mood: "grounded", energy: "medium", genre: "funk", activity: "night" },
+  { title: "Location", artist: "Khalid", mood: "grounded", energy: "medium", genre: "r&b", activity: "home" },
+  { title: "Better", artist: "Khalid", mood: "restorative", energy: "medium", genre: "r&b", activity: "home" },
+  { title: "Circles", artist: "Post Malone", mood: "reflective", energy: "medium", genre: "pop", activity: "commute" },
+  { title: "Adore You", artist: "Harry Styles", mood: "bright", energy: "medium", genre: "pop", activity: "social" },
+  { title: "Calm Down", artist: "Rema and Selena Gomez", mood: "bright", energy: "high", genre: "afrobeats", activity: "social" },
+  { title: "Lose Control", artist: "Teddy Swims", mood: "tender", energy: "medium", genre: "soul pop", activity: "unwind" }
 ];
 
 const wordProfiles = {
@@ -508,6 +509,11 @@ function escapeHTML(value) {
     .replaceAll(">", "&gt;")
     .replaceAll("\"", "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+function musicVideoSearchUrl(song) {
+  const query = `${song.title || ""} ${song.artist || ""} official music video`.trim();
+  return `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
 }
 
 function setLogo(choice) {
@@ -1314,6 +1320,7 @@ async function loadSpotifyPlaylist(playlistId) {
     energy: inferEnergy(song)
   }));
   setJSON(storageKeys.tracks, normalized.length ? normalized : demoSongs);
+  storageRemove(storageKeys.importSkipped);
   storageSet(storageKeys.source, "Spotify");
   if (note) note.innerHTML = `Imported <strong>${normalized.length || demoSongs.length}</strong> tracks from <strong>Spotify</strong>.`;
   link?.removeAttribute("hidden");
@@ -1474,6 +1481,7 @@ async function loadYouTubePlaylist(playlistId) {
   }, 100);
   const tracks = normalizeImportedTracks(items.map(youtubeItemToSong));
   setJSON(storageKeys.tracks, tracks.length ? tracks : demoSongs);
+  storageRemove(storageKeys.importSkipped);
   storageSet(storageKeys.source, "YouTube Music");
   if (note) note.innerHTML = `Imported <strong>${tracks.length || demoSongs.length}</strong> tracks from <strong>YouTube</strong>.`;
   link?.removeAttribute("hidden");
@@ -1658,6 +1666,7 @@ async function importLastfm(method) {
       : data.toptracks?.track;
   const tracks = normalizeImportedTracks((list || []).map(lastfmTrackToSong));
   setJSON(storageKeys.tracks, tracks.length ? tracks : demoSongs);
+  storageRemove(storageKeys.importSkipped);
   storageSet(storageKeys.source, "Last.fm");
   if (status) status.textContent = `Imported ${tracks.length || demoSongs.length} tracks from Last.fm.`;
   if (note) note.innerHTML = `Imported <strong>${tracks.length || demoSongs.length}</strong> tracks from <strong>Last.fm</strong>.`;
@@ -1750,6 +1759,26 @@ function setupSourceChips() {
   });
 }
 
+function setupImportChoiceLinks() {
+  document.querySelectorAll("[data-skip-import-result]").forEach((link) => {
+    link.addEventListener("click", () => {
+      storageSet(storageKeys.importSkipped, "true");
+      storageRemove(storageKeys.tracks);
+    });
+  });
+  document.querySelectorAll("[data-go-import]").forEach((link) => {
+    link.addEventListener("click", () => {
+      storageRemove(storageKeys.importSkipped);
+    });
+  });
+  document.querySelectorAll("[data-result-link]").forEach((link) => {
+    link.addEventListener("click", () => {
+      const tracks = getJSON(storageKeys.tracks, []);
+      if (!Array.isArray(tracks) || !tracks.length) storageSet(storageKeys.importSkipped, "true");
+    });
+  });
+}
+
 function setupManualImport() {
   const title = document.querySelector("[data-manual-title]");
   const artist = document.querySelector("[data-manual-artist]");
@@ -1828,6 +1857,7 @@ function setupManualImport() {
       return;
     }
     setJSON(storageKeys.tracks, songs);
+    storageRemove(storageKeys.importSkipped);
     storageSet(storageKeys.source, "Manual import");
     if (note) note.innerHTML = `Saved <strong>${songs.length}</strong> manual song${songs.length === 1 ? "" : "s"}.`;
     link?.removeAttribute("hidden");
@@ -1841,6 +1871,7 @@ async function saveImport() {
   const tracks = parsePlaylist(await getPlaylistText());
   const selected = storageGet(storageKeys.source) || "Manual import";
   setJSON(storageKeys.tracks, tracks.length ? tracks : demoSongs);
+  storageRemove(storageKeys.importSkipped);
   if (note) note.innerHTML = `Saved <strong>${tracks.length || demoSongs.length}</strong> tracks from <strong>${selected}</strong> for today's result.`;
   link?.removeAttribute("hidden");
 }
@@ -1883,9 +1914,9 @@ function rankRecommendations(analysis) {
 function renderSongItems(songs, analysis, showReason = true) {
   return songs.map((song) => `
     <li>
-      <span class="song-rank">${song.score}</span>
+      <a class="song-rank mv-icon" href="${musicVideoSearchUrl(song)}" target="_blank" rel="noreferrer" aria-label="Open music video search for ${escapeHTML(song.title)}">MV</a>
       <div>
-        <strong>${escapeHTML(song.title)}</strong>
+        <a class="song-title-link" href="${musicVideoSearchUrl(song)}" target="_blank" rel="noreferrer"><strong>${escapeHTML(song.title)}</strong></a>
         <small>${escapeHTML(song.artist)}</small>
         ${showReason ? `<p>${reasonFor(song, analysis, song.fallback)}</p>` : ""}
       </div>
@@ -1893,9 +1924,29 @@ function renderSongItems(songs, analysis, showReason = true) {
   `).join("");
 }
 
-function renderResults(topSongs, recommended, analysis, hasImportedTracks) {
+function renderResults(topSongs, recommended, analysis, hasImportedTracks, importSkipped) {
   const grid = document.querySelector("[data-results-grid]");
   if (!grid) return;
+  if (importSkipped) {
+    grid.innerHTML = `
+      <article class="result-card recommendation-result recommendation-only">
+        <div class="result-card-top">
+          <div>
+            <span>Recommendation mode</span>
+            <h3>30 songs for a ${String(analysis?.word || "Reflective").toLowerCase()} day</h3>
+          </div>
+          <strong>30</strong>
+        </div>
+        <ol class="song-list compact-song-list">
+          ${renderSongItems(recommended, analysis, false)}
+        </ol>
+      </article>
+    `;
+    grid.hidden = false;
+    grid.classList.add("recommendation-only-grid");
+    return;
+  }
+  grid.classList.remove("recommendation-only-grid");
   grid.innerHTML = `
     <article class="result-card feature-result">
       <div class="result-card-top">
@@ -1938,17 +1989,20 @@ function setupResultPage() {
     profile: wordProfiles.Reflective
   };
   const tracks = getJSON(storageKeys.tracks, []);
+  const importSkipped = storageGet(storageKeys.importSkipped) === "true";
   const hasImportedTracks = Array.isArray(tracks) && tracks.length > 0;
   const sourceSongs = hasImportedTracks ? tracks : recommendedSongs;
   word.textContent = analysis.word;
-  summary.textContent = hasImportedTracks
+  summary.textContent = importSkipped
+    ? "Tell us how you feel and import your music to see a personal top five. For now, Moodix is showing recommended songs based on your mood."
+    : hasImportedTracks
     ? (analysis.detail || `${analysis.weekday} reads as ${analysis.word.toLowerCase()}.`)
     : "Preview mode: if you import music, Moodix shows a chosen word to describe your mood and a top five music playlist from your songs.";
   if (preview) {
     preview.hidden = hasImportedTracks;
   }
   moodixAudio.setMood(analysis.word);
-  renderResults(rankSongs(sourceSongs, analysis), rankRecommendations(analysis), analysis, hasImportedTracks);
+  renderResults(rankSongs(sourceSongs, analysis), rankRecommendations(analysis), analysis, hasImportedTracks, importSkipped || !hasImportedTracks);
 }
 
 function setupIntentButtons() {
@@ -2075,6 +2129,7 @@ setupImportContext();
 setupYouTubeImport();
 setupLastfmImport();
 setupSourceChips();
+setupImportChoiceLinks();
 setupManualImport();
 setupIntentButtons();
 setupSignup();
@@ -2084,6 +2139,6 @@ document.querySelector("[data-save-import]")?.addEventListener("click", saveImpo
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=47").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=48").catch(() => {});
   });
 }
