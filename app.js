@@ -822,9 +822,14 @@ function analyzeDay(formData, meta = getLocalDayMeta()) {
 }
 
 function analysisDetail(word, formData) {
-  const needLabels = { focus: "focus", lift: "lift", settle: "calm", feel: "emotional space", move: "momentum" };
-  const settingLabels = { home: "home", work: "work or school", outside: "movement", social: "people" };
-  return `Because you pointed toward ${settingLabels[formData.get("setting")] || "today"} and asked music for ${needLabels[formData.get("need")] || "support"}, Moodix reads the day as ${word.toLowerCase()}.`;
+  const getAnswer = (key) => typeof formData.get === "function" ? formData.get(key) : formData?.[key];
+  const needLabels = { focus: "focus", lift: "a lift", settle: "calm", feel: "emotional space", move: "momentum" };
+  const settingLabels = { home: "a home setting", work: "work or school", outside: "movement outside", social: "people around you" };
+  const paceLabels = { slow: "a softer pace", steady: "a steady pace", bright: "an upbeat pace", intense: "higher energy" };
+  const setting = settingLabels[getAnswer("setting")] || "today's setting";
+  const need = needLabels[getAnswer("need")] || "support";
+  const pace = paceLabels[getAnswer("pace")] || "your chosen pace";
+  return `Moodix weighed your setting, pace, and what you wanted music to do. The strongest signals were ${setting}, ${pace}, and a need for ${need}, so the match leans ${word.toLowerCase()}.`;
 }
 
 function getStoredAnalysis() {
@@ -851,7 +856,7 @@ function setupDayForm() {
       storageSet(storageKeys.checkMode, "today");
       setJSON(storageKeys.analysis, analysis);
       document.querySelector("[data-day-word]").textContent = analysis.word;
-      document.querySelector("[data-day-summary]").textContent = `${analysis.weekday} reads as ${analysis.word.toLowerCase()}. Moodix saved this for ${analysis.date}.`;
+      document.querySelector("[data-day-summary]").textContent = `${analysis.word} is today's Moodix word. Saved for ${analysis.date}.`;
       document.querySelector("[data-analysis-detail]").textContent = analysis.detail;
       moodixAudio.setMood(analysis.word);
       card.hidden = false;
@@ -872,7 +877,7 @@ function setupDayForm() {
     storageSet(storageKeys.checkMode, "today");
     setJSON(storageKeys.analysis, analysis);
     document.querySelector("[data-day-word]").textContent = analysis.word;
-    document.querySelector("[data-day-summary]").textContent = `${analysis.weekday} reads as ${analysis.word.toLowerCase()}. Moodix saved this for ${analysis.date}.`;
+    document.querySelector("[data-day-summary]").textContent = `${analysis.word} is today's Moodix word. Saved for ${analysis.date}.`;
     document.querySelector("[data-analysis-detail]").textContent = analysis.detail;
     moodixAudio.setMood(analysis.word);
     card.hidden = false;
@@ -1992,11 +1997,14 @@ function setupResultPage() {
   const importSkipped = storageGet(storageKeys.importSkipped) === "true";
   const hasImportedTracks = Array.isArray(tracks) && tracks.length > 0;
   const sourceSongs = hasImportedTracks ? tracks : recommendedSongs;
+  const analysisSummary = analysis.detail?.includes("reads the day as")
+    ? analysisDetail(analysis.word, analysis.answers || {})
+    : analysis.detail;
   word.textContent = analysis.word;
   summary.textContent = importSkipped
     ? "Tell us how you feel and import your music to see a personal top five. For now, Moodix is showing recommended songs based on your mood."
     : hasImportedTracks
-    ? (analysis.detail || `${analysis.weekday} reads as ${analysis.word.toLowerCase()}.`)
+    ? (analysisSummary || `${analysis.word} is today's Moodix word.`)
     : "Preview mode: if you import music, Moodix shows a chosen word to describe your mood and a top five music playlist from your songs.";
   if (preview) {
     preview.hidden = hasImportedTracks;
@@ -2139,6 +2147,6 @@ document.querySelector("[data-save-import]")?.addEventListener("click", saveImpo
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=48").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=49").catch(() => {});
   });
 }
