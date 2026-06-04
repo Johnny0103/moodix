@@ -1919,7 +1919,13 @@ function rankRecommendations(analysis) {
 function renderSongItems(songs, analysis, showReason = true) {
   return songs.map((song) => `
     <li>
-      <a class="song-rank mv-icon" href="${musicVideoSearchUrl(song)}" target="_blank" rel="noreferrer" aria-label="Open music video search for ${escapeHTML(song.title)}">MV</a>
+      <a class="song-rank mv-icon" href="${musicVideoSearchUrl(song)}" target="_blank" rel="noreferrer" aria-label="Open music video search for ${escapeHTML(song.title)}">
+        <svg viewBox="0 0 44 44" aria-hidden="true" focusable="false">
+          <rect x="5" y="10" width="27" height="24" rx="6"></rect>
+          <path d="M18 17.5v9l8-4.5-8-4.5Z"></path>
+          <path d="M33 18.5l6-4v15l-6-4"></path>
+        </svg>
+      </a>
       <div>
         <a class="song-title-link" href="${musicVideoSearchUrl(song)}" target="_blank" rel="noreferrer"><strong>${escapeHTML(song.title)}</strong></a>
         <small>${escapeHTML(song.artist)}</small>
@@ -2147,6 +2153,6 @@ document.querySelector("[data-save-import]")?.addEventListener("click", saveImpo
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=49").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=50").catch(() => {});
   });
 }
