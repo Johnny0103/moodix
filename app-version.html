@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=51">
+    <link rel="stylesheet" href="styles.css?v=52">
   </head>
   <body class="signup-page" data-requires-signin>
     <header class="site-header">
@@ -29,10 +29,15 @@
       <section class="signup-hero" aria-labelledby="signup-title">
         <div class="signup-copy">
           <p class="eyebrow">Step 4 / App version</p>
-          <h1 id="signup-title">Would you join the Moodix app version?</h1>
+          <h1 id="signup-title">Moodix, closer to your music.</h1>
           <p>
-            The app version would remember your daily check-ins, import playlists faster, and build mood matches from your real listening patterns.
+            The app version would remember daily check-ins, import playlists faster, and turn real listening patterns into better mood matches.
           </p>
+          <div class="app-feature-grid" aria-label="App version highlights">
+            <span>Daily mood memory</span>
+            <span>Faster playlist import</span>
+            <span>Smarter song matching</span>
+          </div>
           <div class="intent-buttons" data-intent-buttons>
             <button class="intent-button active" type="button" data-intent="yes">Yes, early access</button>
             <button class="intent-button" type="button" data-intent="maybe">Maybe, send updates</button>
@@ -53,29 +58,51 @@
           </div>
         </div>
 
-        <form class="signup-card" data-signup-form>
-          <input type="hidden" name="intent" value="yes" data-intent-field>
-          <label for="signup-name">Name</label>
-          <input id="signup-name" name="name" type="text" autocomplete="name" placeholder="Your name">
+        <div class="app-signup-panel">
+          <div class="app-preview-card" aria-hidden="true">
+            <div class="app-preview-top">
+              <span></span>
+              <span></span>
+            </div>
+            <div class="app-preview-word">Focused</div>
+            <div class="app-preview-bars">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <p>Tomorrow's mix is ready</p>
+          </div>
 
-          <label for="signup-email">Email</label>
-          <input id="signup-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+          <form class="signup-card" data-signup-form>
+            <input type="hidden" name="intent" value="yes" data-intent-field>
+            <div class="signup-card-heading">
+              <p class="eyebrow">Waitlist</p>
+              <h2>Save your spot</h2>
+            </div>
 
-          <label for="signup-source">Preferred music source</label>
-          <select id="signup-source" name="source">
-            <option>Spotify</option>
-            <option>Apple Music</option>
-            <option>YouTube Music</option>
-            <option>SoundCloud</option>
-            <option>Other</option>
-          </select>
+            <label for="signup-name">Name</label>
+            <input id="signup-name" name="name" type="text" autocomplete="name" placeholder="Your name">
 
-          <button class="button primary" type="submit">Join the app waitlist</button>
-          <p class="form-note" data-signup-note></p>
-        </form>
+            <label for="signup-email">Email</label>
+            <input id="signup-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+
+            <label for="signup-source">Preferred music source</label>
+            <select id="signup-source" name="source">
+              <option>Spotify</option>
+              <option>Apple Music</option>
+              <option>YouTube Music</option>
+              <option>SoundCloud</option>
+              <option>Other</option>
+            </select>
+
+            <button class="button primary" type="submit">Join the app waitlist</button>
+            <p class="form-note" data-signup-note></p>
+          </form>
+        </div>
       </section>
     </main>
 
-    <script src="app.js?v=51" defer></script>
+    <script src="app.js?v=52" defer></script>
   </body>
 </html>
