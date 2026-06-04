@@ -516,6 +516,34 @@ function musicVideoSearchUrl(song) {
   return `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
 }
 
+function musicListenSearchUrl(song) {
+  const query = `${song.title || ""} ${song.artist || ""}`.trim();
+  return `https://music.youtube.com/search?q=${encodeURIComponent(query)}`;
+}
+
+function songArtworkPlaceholder(song) {
+  const title = escapeHTML(String(song.title || "Moodix").slice(0, 18));
+  const artist = escapeHTML(String(song.artist || "Music").slice(0, 20));
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160">
+      <defs>
+        <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0" stop-color="#ffd166"/>
+          <stop offset="0.55" stop-color="#ff9f1c"/>
+          <stop offset="1" stop-color="#2a1810"/>
+        </linearGradient>
+      </defs>
+      <rect width="160" height="160" rx="24" fill="url(#g)"/>
+      <circle cx="112" cy="48" r="22" fill="rgba(255,255,255,.28)"/>
+      <path d="M47 55h58v50H47z" rx="12" fill="rgba(31,19,11,.86)"/>
+      <path d="M69 68v24l22-12-22-12Z" fill="#fff7ea"/>
+      <text x="18" y="124" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#fff7ea">${title}</text>
+      <text x="18" y="142" font-family="Arial, sans-serif" font-size="11" fill="rgba(255,247,234,.8)">${artist}</text>
+    </svg>
+  `;
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+
 function setLogo(choice) {
   const selected = logoMarks[choice] ? choice : "pulse";
   document.querySelectorAll("[data-brand-mark]").forEach((mark) => {
@@ -1919,20 +1947,50 @@ function rankRecommendations(analysis) {
 function renderSongItems(songs, analysis, showReason = true) {
   return songs.map((song) => `
     <li>
-      <a class="song-rank mv-icon" href="${musicVideoSearchUrl(song)}" target="_blank" rel="noreferrer" aria-label="Open music video search for ${escapeHTML(song.title)}">
-        <svg viewBox="0 0 44 44" aria-hidden="true" focusable="false">
-          <rect x="5" y="10" width="27" height="24" rx="6"></rect>
-          <path d="M18 17.5v9l8-4.5-8-4.5Z"></path>
-          <path d="M33 18.5l6-4v15l-6-4"></path>
-        </svg>
+      <a class="song-rank mv-icon album-art-link" href="${musicVideoSearchUrl(song)}" target="_blank" rel="noreferrer" aria-label="Open music video for ${escapeHTML(song.title)}">
+        <img class="song-artwork" src="${songArtworkPlaceholder(song)}" alt="${escapeHTML(song.title)} album artwork" loading="lazy" data-artwork-query="${escapeHTML(`${song.title || ""} ${song.artist || ""}`.trim())}">
+        <span class="video-corner" aria-hidden="true">
+          <svg viewBox="0 0 18 18" focusable="false">
+            <path d="M5.8 4.5v9l7-4.5-7-4.5Z"></path>
+          </svg>
+        </span>
       </a>
       <div>
-        <a class="song-title-link" href="${musicVideoSearchUrl(song)}" target="_blank" rel="noreferrer"><strong>${escapeHTML(song.title)}</strong></a>
+        <a class="song-title-link" href="${musicListenSearchUrl(song)}" target="_blank" rel="noreferrer" data-music-query="${escapeHTML(`${song.title || ""} ${song.artist || ""}`.trim())}"><strong>${escapeHTML(song.title)}</strong></a>
         <small>${escapeHTML(song.artist)}</small>
         ${showReason ? `<p>${reasonFor(song, analysis, song.fallback)}</p>` : ""}
       </div>
     </li>
   `).join("");
+}
+
+async function hydrateSongArtwork() {
+  const artworkImages = [...document.querySelectorAll("[data-artwork-query]")];
+  if (!artworkImages.length || !window.fetch) return;
+  const uniqueQueries = [...new Set(artworkImages.map((image) => image.dataset.artworkQuery).filter(Boolean))];
+  await Promise.all(uniqueQueries.map(async (query) => {
+    try {
+      const response = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=1`);
+      if (!response.ok) return;
+      const data = await response.json();
+      const track = data.results?.[0];
+      if (!track?.artworkUrl100) return;
+      const artwork = track.artworkUrl100.replace("100x100bb", "300x300bb");
+      artworkImages
+        .filter((image) => image.dataset.artworkQuery === query)
+        .forEach((image) => {
+          image.src = artwork;
+        });
+      if (track.trackViewUrl) {
+        document.querySelectorAll("[data-music-query]")
+          .forEach((link) => {
+            if (link.dataset.musicQuery === query) link.href = track.trackViewUrl;
+          });
+      }
+    } catch {
+      // Artwork is decorative; fallback covers keep the result usable.
+    }
+  }));
 }
 
 function renderResults(topSongs, recommended, analysis, hasImportedTracks, importSkipped) {
@@ -1955,6 +2013,7 @@ function renderResults(topSongs, recommended, analysis, hasImportedTracks, impor
     `;
     grid.hidden = false;
     grid.classList.add("recommendation-only-grid");
+    hydrateSongArtwork();
     return;
   }
   grid.classList.remove("recommendation-only-grid");
@@ -1985,6 +2044,7 @@ function renderResults(topSongs, recommended, analysis, hasImportedTracks, impor
     </article>
   `;
   grid.hidden = false;
+  hydrateSongArtwork();
 }
 
 function setupResultPage() {
@@ -2153,6 +2213,6 @@ document.querySelector("[data-save-import]")?.addEventListener("click", saveImpo
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js?v=50").catch(() => {});
+    navigator.serviceWorker.register("sw.js?v=51").catch(() => {});
   });
 }
